@@ -1,0 +1,53 @@
+﻿@model MiningOps.Models.SupervisorViewModel
+
+@{
+    ViewData["Title"] = "Complete Supervisor Profile";
+}
+<partial name="_Messages" />
+
+<h2>Complete Supervisor Profile</h2>
+
+<form asp-action="CompleteSupervisorProfile" method="post">
+    <input type="hidden" asp-for="AccId" />
+
+    <div class="form-group">
+        <label asp-for="Team"></label>
+        <input asp-for="Team" class="form-control" />
+        <span asp-validation-for="Team" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="MineLocation"></label>
+        <input asp-for="MineLocation" class="form-control" />
+        <span asp-validation-for="MineLocation" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Shift"></label>
+        <select asp-for="Shift" class="form-control">
+            <option value="">Select Shift</option>
+            <option value="Day">Day</option>
+            <option value="Night">Night</option>
+        </select>
+        <span asp-validation-for="Shift" class="text-danger"></span>
+    </div>
+
+    <div class="form-check">
+        <input asp-for="CanViewReports" class="form-check-input" />
+        <label asp-for="CanViewReports" class="form-check-label"></label>
+    </div>
+
+    <div class="form-check">
+        <input asp-for="CanManageTasks" class="form-check-input" />
+        <label asp-for="CanManageTasks" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Save Profile</button>
+</form>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

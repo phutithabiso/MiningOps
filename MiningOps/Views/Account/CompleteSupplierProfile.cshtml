@@ -1,0 +1,58 @@
+﻿@model MiningOps.Models.SupplierViewModel
+
+@{
+    ViewData["Title"] = "Complete Supplier Profile";
+}
+
+
+<partial name="_Messages" />
+
+<h1>Complete Supplier Profile</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CompleteSupplierProfile" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="CompanyName" class="control-label"></label>
+                <input asp-for="CompanyName" class="form-control" />
+                <span asp-validation-for="CompanyName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ContactPerson" class="control-label"></label>
+                <input asp-for="ContactPerson" class="form-control" />
+                <span asp-validation-for="ContactPerson" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-group form-check">
+                <input class="form-check-input" asp-for="CanViewOrders" />
+                <label class="form-check-label" asp-for="CanViewOrders"></label>
+            </div>
+
+            <div class="form-group form-check">
+                <input class="form-check-input" asp-for="CanManageInventory" />
+                <label class="form-check-label" asp-for="CanManageInventory"></label>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Save Profile" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

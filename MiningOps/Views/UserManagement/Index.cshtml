@@ -1,0 +1,151 @@
+﻿@model IEnumerable<MiningOps.Entity.RegisterMining>
+
+@using MiningOps.Entity
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<h1>User Management</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New User</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Role</th>
+            <th>Profile Details</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FullName</td>
+                <td>@user.Username</td>
+                <td>@user.Email</td>
+                <td>@user.PhoneNumber</td>
+                <td>@user.Role</td>
+                <td>
+                    @if (user.Role == UserRole.Admin)
+                    {
+                        if (user.AdminProfile != null)
+                        {
+                            <text>
+                                Department: @user.AdminProfile.Department<br />
+                                Can Manage Users: @user.AdminProfile.CanManageUsers<br />
+                                Can Approve Requests: @user.AdminProfile.CanApproveRequests
+                            </text>
+                        }
+                        else
+                        {
+                            <text>Profile Incomplete</text>
+                        }
+                    }
+                    else if (user.Role == UserRole.Supervisor)
+                    {
+                        if (user.SupervisorProfile != null)
+                        {
+                            <text>
+                                Team: @user.SupervisorProfile.Team<br />
+                                Mine: @user.SupervisorProfile.MineLocation<br />
+                                Shift: @user.SupervisorProfile.Shift<br />
+                                Can View Reports: @user.SupervisorProfile.CanViewReports<br />
+                                Can Manage Tasks: @user.SupervisorProfile.CanManageTasks
+                            </text>
+                        }
+                        else
+                        {
+                            <text>Profile Incomplete</text>
+                        }
+                    }
+                    else if (user.Role == UserRole.Supplier)
+                    {
+                        if (user.SupplierProfile != null)
+                        {
+                            <text>
+                                Company: @user.SupplierProfile.CompanyName<br />
+                                Contact: @user.SupplierProfile.ContactPerson<br />
+                                Address: @user.SupplierProfile.Address<br />
+                                Can View Orders: @user.SupplierProfile.CanViewOrders<br />
+                                Can Manage Inventory: @user.SupplierProfile.CanManageInventory
+                            </text>
+                        }
+                        else
+                        {
+                            <text>Profile Incomplete</text>
+                        }
+                    }
+                </td>
+                <td>@user.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@(user.UpdatedAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@user.AccId" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@user.AccId" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@user.AccId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<style>
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+        border-collapse: collapse;
+    }
+
+        .table th {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+            vertical-align: top;
+            font-weight: 600;
+        }
+
+        .table td {
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+            vertical-align: top;
+        }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .btn {
+        margin: 2px;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border-radius: 0.2rem;
+    }
+
+    h1 {
+        color: #343a40;
+        margin-bottom: 1rem;
+    }
+
+    /* Responsive table */
+    @@media (max-width: 768px) {
+        .table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    }
+</style>
