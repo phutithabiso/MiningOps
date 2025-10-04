@@ -7,7 +7,7 @@ namespace MiningOps.Models
     public class InvetoryViewModel
     {
         [Key]
-        public int InventoryId { get; set; }
+      
 
         [Required(ErrorMessage = "Item name is required")]
         [MaxLength(150)]

@@ -35,5 +35,6 @@ namespace MiningOps.Entity
 
             base.OnModelCreating(modelBuilder);
         }
+        public DbSet<MiningOps.Models.InvetoryViewModel> InvetoryViewModel { get; set; } = default!;
     }
 }
