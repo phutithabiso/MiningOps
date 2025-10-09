@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MiningOps.Entity;
 using MiningOps.Models;
 
 namespace MiningOps.Controllers
 {
-    [Authorize] // Require login for all actions
+   // [Authorize] // Require login for all actions
     public class InventoryController : Controller
     {
         private readonly AppDbContext _context;
@@ -19,19 +20,144 @@ namespace MiningOps.Controllers
         }
 
         // ✅ All roles can view inventory
-        [Authorize(Roles = "Admin,Supervisor,Supplier")]
-        public async Task<IActionResult> Index()
+       // [Authorize(Roles = "Admin,Supervisor,Supplier")]
+        //public async Task<IActionResult> Index()
+        //{
+        //    var inventoryItems = await _context.InventoryDb
+        //        .Include(i => i.Warehouse)
+        //        .ToListAsync();
+
+        //    return View(inventoryItems);
+        //}
+
+        // ✅ All roles can view inventory
+       // [Authorize(Roles = "Admin,Supervisor,Supplier")]
+
+public async Task<IActionResult> Index(
+    string? searchString,
+    string? warehouseFilter,
+    string? categoryFilter,
+    string? stockStatusFilter,
+    string? sortOrder,
+    int? pageNumber,
+    int pageSize = 10)
+    {
+        try
         {
-            var inventoryItems = await _context.InventoryDb
+            // --- Sorting Parameters ---
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["QuantitySortParm"] = sortOrder == "quantity" ? "quantity_desc" : "quantity";
+            ViewData["CostSortParm"] = sortOrder == "cost" ? "cost_desc" : "cost";
+            ViewData["WarehouseSortParm"] = sortOrder == "warehouse" ? "warehouse_desc" : "warehouse";
+            ViewData["DateSortParm"] = sortOrder == "date" ? "date_desc" : "date";
+
+            // --- Filter ViewData ---
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["WarehouseFilter"] = warehouseFilter;
+            ViewData["CategoryFilter"] = categoryFilter;
+            ViewData["StockStatusFilter"] = stockStatusFilter;
+
+            // --- Base Query ---
+            var inventoryQuery = _context.InventoryDb
                 .Include(i => i.Warehouse)
+                .AsQueryable();
+
+            // --- Search ---
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                inventoryQuery = inventoryQuery.Where(i =>
+                    i.ItemName.Contains(searchString) ||
+                    (i.Description != null && i.Description.Contains(searchString)) ||
+                    (i.Unit != null && i.Unit.Contains(searchString)));
+            }
+
+            // --- Warehouse Filter ---
+            if (!string.IsNullOrEmpty(warehouseFilter) && int.TryParse(warehouseFilter, out int warehouseId))
+            {
+                inventoryQuery = inventoryQuery.Where(i => i.WarehouseId == warehouseId);
+            }
+
+            // --- Category Filter (by ItemName or future Category column) ---
+            if (!string.IsNullOrEmpty(categoryFilter))
+            {
+                inventoryQuery = inventoryQuery.Where(i => i.ItemName == categoryFilter);
+            }
+
+            // --- Stock Status Filter ---
+            if (!string.IsNullOrEmpty(stockStatusFilter))
+            {
+                inventoryQuery = stockStatusFilter switch
+                {
+                    "outofstock" => inventoryQuery.Where(i => i.Quantity <= 0),
+                    "lowstock" => inventoryQuery.Where(i => i.Quantity > 0 && i.Quantity <= i.ReorderLevel),
+                    "instock" => inventoryQuery.Where(i => i.Quantity > i.ReorderLevel),
+                    _ => inventoryQuery
+                };
+            }
+
+            // --- Sorting ---
+            inventoryQuery = sortOrder switch
+            {
+                "name_desc" => inventoryQuery.OrderByDescending(i => i.ItemName),
+                "quantity" => inventoryQuery.OrderBy(i => i.Quantity),
+                "quantity_desc" => inventoryQuery.OrderByDescending(i => i.Quantity),
+                "cost" => inventoryQuery.OrderBy(i => i.UnitCost),
+                "cost_desc" => inventoryQuery.OrderByDescending(i => i.UnitCost),
+                "warehouse" => inventoryQuery.OrderBy(i => i.Warehouse.Name),
+                "warehouse_desc" => inventoryQuery.OrderByDescending(i => i.Warehouse.Name),
+                "date" => inventoryQuery.OrderBy(i => i.LastUpdated),
+                "date_desc" => inventoryQuery.OrderByDescending(i => i.LastUpdated),
+                _ => inventoryQuery.OrderBy(i => i.ItemName)
+            };
+
+            // --- Dropdown Lists ---
+            var warehouses = await _context.WarehousesDb
+                .Select(w => new { w.WarehouseId, w.Name })
+                .OrderBy(w => w.Name)
                 .ToListAsync();
 
-            return View(inventoryItems);
-        }
+            var categories = await _context.InventoryDb
+                .Where(i => i.ItemName != null)
+                .Select(i => i.ItemName)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
 
-        // ✅ All roles can view details
-        [Authorize(Roles = "Admin,Supervisor,Supplier")]
-        public async Task<IActionResult> Details(int? id)
+            ViewBag.Warehouses = new SelectList(warehouses, "WarehouseId", "Name");
+            ViewBag.Categories = categories;
+
+            // --- Statistics ---
+            var totalItems = await inventoryQuery.CountAsync();
+            var totalValue = await inventoryQuery.SumAsync(i => (decimal?)(i.Quantity * i.UnitCost)) ?? 0;
+            var outOfStockCount = await inventoryQuery.CountAsync(i => i.Quantity <= 0);
+            var lowStockCount = await inventoryQuery.CountAsync(i => i.Quantity > 0 && i.Quantity <= i.ReorderLevel);
+
+            ViewBag.TotalItems = totalItems;
+            ViewBag.TotalValue = totalValue;
+            ViewBag.OutOfStockCount = outOfStockCount;
+            ViewBag.LowStockCount = lowStockCount;
+            ViewBag.InStockCount = totalItems - outOfStockCount - lowStockCount;
+
+            // --- Pagination ---
+            var paginatedItems = await PaginatedList<InventoryItem>.CreateAsync(
+                inventoryQuery.AsNoTracking(),
+                pageNumber ?? 1,
+                pageSize);
+
+            return View(paginatedItems);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading inventory index page");
+            TempData["ErrorMessage"] = "An error occurred while loading inventory data.";
+            return View(new List<InventoryItem>());
+        }
+    }
+
+    // ✅ All roles can view details
+    //  [Authorize(Roles = "Admin,Supervisor,Supplier")]
+    public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
@@ -45,7 +171,7 @@ namespace MiningOps.Controllers
         }
 
         // ✅ Only Admin and Supervisor can add inventory
-        [Authorize(Roles = "Admin,Supervisor")]
+       // [Authorize(Roles = "Admin,Supervisor")]
         public IActionResult Create()
         {
             ViewData["Warehouses"] = _context.WarehousesDb.ToList();
@@ -89,7 +215,7 @@ namespace MiningOps.Controllers
         }
 
         // ✅ Only Admin and Supervisor can edit
-        [Authorize(Roles = "Admin,Supervisor")]
+       // [Authorize(Roles = "Admin,Supervisor")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -103,8 +229,7 @@ namespace MiningOps.Controllers
                 Quantity = inventory.Quantity,
                 UnitCost = inventory.UnitCost,
                 Description = inventory.Description,
-                WarehouseId = inventory.WarehouseId,
-                LastUpdated = DateTime.UtcNow
+                WarehouseId = inventory.WarehouseId
             };
 
             ViewData["Warehouses"] = _context.WarehousesDb.ToList();
@@ -113,7 +238,7 @@ namespace MiningOps.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Supervisor")]
+       // [Authorize(Roles = "Admin,Supervisor")]
         public async Task<IActionResult> Edit(int id, InvetoryViewModel model)
         {
             if (ModelState.IsValid)
@@ -128,7 +253,7 @@ namespace MiningOps.Controllers
                     inventory.UnitCost = model.UnitCost;
                     inventory.Description = model.Description;
                     inventory.WarehouseId = model.WarehouseId;
-                        inventory.LastUpdated = DateTime.UtcNow;
+                    inventory.LastUpdated = DateTime.UtcNow;
 
                     _context.Update(inventory);
                     await _context.SaveChangesAsync();
@@ -147,7 +272,7 @@ namespace MiningOps.Controllers
             return View(model);
         }
 
-        // ✅ Only Admin can delete
+        //  Only Admin can delete
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
