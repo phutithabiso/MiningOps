@@ -29,9 +29,14 @@ namespace MiningOps.Entity
 
         public decimal TotalAmount { get; set; } = 0m;
 
+        // New Foreign Key for MaterialRequest
+        public int? MaterialRequestId { get; set; }
+
+        [ForeignKey(nameof(MaterialRequestId))]
+        public MaterialRequest? MaterialRequest { get; set; }
+
         // Navigation
         public ICollection<OrderItem>? Items { get; set; }
         public ICollection<Invoice>? Invoices { get; set; }
     }
 }
-

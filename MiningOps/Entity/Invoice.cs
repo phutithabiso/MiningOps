@@ -16,6 +16,7 @@ namespace MiningOps.Entity
 
         public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
         public DateTime? DueDate { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; } = 0m;
         public InvoiceStatus Status { get; set; } = InvoiceStatus.Unpaid;
         public string? InvoiceReference { get; set; }

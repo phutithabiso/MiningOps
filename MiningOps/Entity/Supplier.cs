@@ -28,5 +28,10 @@ namespace MiningOps.Entity
         // Permissions
         public bool CanViewOrders { get; set; } = true;
         public bool CanManageInventory { get; set; } = false;
+
+        // Navigation
+        public ICollection<SupplierContract>? Contracts { get; set; }
+        public ICollection<SupplierPerformance>? Performances { get; set; }
+        public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
     }
 }

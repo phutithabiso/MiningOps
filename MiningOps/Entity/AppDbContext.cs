@@ -14,6 +14,15 @@ namespace MiningOps.Entity
         public DbSet<Supplier> SupplierProfiles { get; set; }
         public DbSet<Warehouse> WarehousesDb { get; set; }
         public DbSet<InventoryItem> InventoryDb { get; set; }
+        public DbSet<SupplierContract> SupplierContractDb { get; set; }
+        public DbSet<SupplierPerformance> SupplierPerformanceDb { get; set; }
+        public DbSet<OrderItem> OrderItemsDb { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrdersDb { get; set; }
+        public DbSet<MaterialRequest> MaterialRequestsDb { get; set; }
+        public DbSet<Invoice> InvoicesDb { get; set; }
+        public DbSet<Payment> PaymentsDb { get; set; }
+
+
 
 
 
@@ -31,10 +40,45 @@ namespace MiningOps.Entity
        .Property(i => i.UnitCost)
        .HasColumnType("decimal(18,2)");
 
+            modelBuilder.Entity<PurchaseOrder>()
+       .HasOne(p => p.Supplier)
+       .WithMany(s => s.PurchaseOrders)
+       .HasForeignKey(p => p.SupplierId)
+       .OnDelete(DeleteBehavior.Restrict); // ✅ Prevents multiple cascade path error
+
+            modelBuilder.Entity<PurchaseOrder>()
+          .HasOne(po => po.MaterialRequest)
+          .WithMany(mr => mr.PurchaseOrders)
+          .HasForeignKey(po => po.MaterialRequestId)
+          .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PurchaseOrder>()
+                .Property(po => po.TotalAmount)
+                  .HasPrecision(18, 2);
+
+            modelBuilder.Entity<SupplierPerformance>()
+      .Property(sp => sp.OnTimeDeliveryRate)
+      .HasPrecision(18, 2); // 18 total digits, 2 decimal places
+
+            modelBuilder.Entity<SupplierPerformance>()
+                .Property(sp => sp.ComplianceScore)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+      .Property(p => p.Amount)
+      .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Invoice>()
+                .Property(i => i.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<OrderItem>()
+                .Property(o => o.UnitPrice)
+                .HasColumnType("decimal(18,2)");
 
 
             base.OnModelCreating(modelBuilder);
         }
-        public DbSet<MiningOps.Models.InvetoryViewModel> InvetoryViewModel { get; set; } = default!;
+   
     }
 }

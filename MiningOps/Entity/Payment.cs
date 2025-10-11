@@ -11,9 +11,11 @@ namespace MiningOps.Entity
         [Required]
         public int InvoiceId { get; set; }
         [ForeignKey(nameof(InvoiceId))]
+
         public Invoice Invoice { get; set; }
 
         public DateTime PaidDate { get; set; } = DateTime.UtcNow;
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; } = 0m;
 
         public int? ApprovedById { get; set; } // Admin who approved

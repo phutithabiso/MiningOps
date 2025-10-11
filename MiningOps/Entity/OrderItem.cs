@@ -8,14 +8,15 @@ namespace MiningOps.Entity
         [Key]
         public int OrderItemId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage ="Item Name is required")]
         [MaxLength(200)]
         public string ItemName { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage =" Quantity is required")]
         public int Quantity { get; set; }
 
-        [Required]
+        [Required(ErrorMessage ="Unit Price is required")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal UnitPrice { get; set; }
 
         [NotMapped]

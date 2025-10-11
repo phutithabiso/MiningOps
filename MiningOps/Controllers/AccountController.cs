@@ -159,7 +159,7 @@ namespace MiningOps.Controllers
             {
                 HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 // Logic for logging out the user
-                return RedirectToAction("Register");
+                return RedirectToAction("Login");
             }
             public IActionResult Index()
             {

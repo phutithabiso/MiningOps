@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiningOps.Entity;
+using MiningOps.Models;
+using MiningOps.Security;
 
 namespace MiningOps.Controllers
 {
@@ -54,54 +56,85 @@ namespace MiningOps.Controllers
         // POST: UserManagement/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RegisterMining user)
+        public async Task<IActionResult> Create(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Add the user
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-
-                // Add role-specific profile
-                switch (user.Role)
-                {
-                    case UserRole.Admin:
-                        _context.AdminProfiles.Add(new Admin
-                        {
-                            
-                            AccId = user.AccId,
-                            Department = "IT"
-                        });
-                        break;
-
-                    case UserRole.Supervisor:
-                        _context.SupervisorProfiles.Add(new Supervisor
-                        {
-                            AccId = user.AccId,
-                            Team = "Operations",
-                            MineLocation = "Default Mine",
-                            Shift = "Day"
-                        });
-                        break;
-
-                    case UserRole.Supplier:
-                        _context.SupplierProfiles.Add(new Supplier
-                        {
-                            AccId = user.AccId,
-                            CompanyName = "New Supplier",
-                            ContactPerson = user.FullName,
-                            Address = "Default Address"
-                        });
-                        break;
-                }
-
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ViewData["Roles"] = Enum.GetValues(typeof(UserRole)).Cast<UserRole>();
+                return View(model);
             }
 
-            ViewData["Roles"] = Enum.GetValues(typeof(UserRole)).Cast<UserRole>();
-            return View(user);
+            // Check duplicates
+            if (_context.RegisterMiningDb.Any(u => u.Username == model.Username))
+            {
+                ModelState.AddModelError("Username", "Username already exists.");
+                return View(model);
+            }
+            if (_context.RegisterMiningDb.Any(u => u.Email == model.Email))
+            {
+                ModelState.AddModelError("Email", "Email already exists.");
+                return View(model);
+            }
+
+            // Hash password
+            string salt = PasswordHasher.GenerateSalt();
+            string hashedPassword = PasswordHasher.HashPassword(model.Password, salt);
+
+            // Map to entity
+            var user = new RegisterMining
+            {
+                FullName = model.FullName.Trim(),
+                Username = model.Username.Trim(),
+                Email = model.Email.Trim(),
+                PhoneNumber = model.PhoneNumber.Trim(),
+                PasswordHash = hashedPassword,
+                Salt = salt,
+                Role = model.Role,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Save entity first to generate AccId
+            _context.RegisterMiningDb.Add(user);
+            await _context.SaveChangesAsync();
+
+            // Add role-specific profile
+            switch (user.Role)
+            {
+                case UserRole.Admin:
+                    _context.AdminProfiles.Add(new Admin
+                    {
+                        AccId = user.AccId,
+                        Department = "IT",
+                        CanManageUsers = true,
+                        CanApproveRequests = true
+                    });
+                    break;
+                case UserRole.Supervisor:
+                    _context.SupervisorProfiles.Add(new Supervisor
+                    {
+                        AccId = user.AccId,
+                        Team = "Operations",
+                        MineLocation = "Default Mine",
+                        Shift = "Day"
+                    });
+                    break;
+                case UserRole.Supplier:
+                    _context.SupplierProfiles.Add(new Supplier
+                    {
+                        AccId = user.AccId,
+                        CompanyName = "New Supplier",
+                        ContactPerson = user.FullName,
+                        Address = "Default Address"
+                    });
+                    break;
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "User created successfully!";
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: UserManagement/Edit/5
         public async Task<IActionResult> Edit(int? id)
