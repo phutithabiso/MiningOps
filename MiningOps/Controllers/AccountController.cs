@@ -220,7 +220,7 @@ namespace MiningOps.Controllers
                 _context.SaveChanges();
 
                 TempData["SuccessMessage"] = "Admin profile completed!";
-                return RedirectToAction("Login");
+                return RedirectToAction("Index", "UserManagement");
             }
             return View(model);
         }
@@ -259,7 +259,7 @@ namespace MiningOps.Controllers
             _context.SaveChanges();
 
             TempData["SuccessMessage"] = $"Supervisor profile for {user.FullName} completed!";
-            return RedirectToAction("Login");
+            return RedirectToAction("Index", "UserManagement");
         }
 
 
@@ -292,11 +292,47 @@ namespace MiningOps.Controllers
                 _context.SaveChanges();
 
                 TempData["SuccessMessage"] = "Supplier profile completed!";
-                return RedirectToAction("Login");
+                return RedirectToAction("Index", "UserManagement");
             }
             return View(model);
         }
 
+        // GET: Edit Admin Profile
+        public IActionResult EditAdminProfile(int id)
+        {
+            var profile = _context.AdminProfiles.FirstOrDefault(a => a.AccId == id);
+            if (profile == null) return NotFound();
+
+            var model = new AdminViewModel
+            {
+                AccId = profile.AccId,
+                Department = profile.Department,
+                CanManageUsers = profile.CanManageUsers,
+                CanApproveRequests = profile.CanApproveRequests
+            };
+
+            return View(model);
+        }
+
+        // POST: Edit Admin Profile
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditAdminProfile(int id, AdminViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var profile = _context.AdminProfiles.FirstOrDefault(a => a.AccId == id);
+            if (profile == null) return NotFound();
+
+            profile.Department = model.Department;
+            profile.CanManageUsers = model.CanManageUsers;
+            profile.CanApproveRequests = model.CanApproveRequests;
+
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Admin profile updated successfully!";
+            return RedirectToAction("Index", "UserManagement");
+        }
 
     }
 }

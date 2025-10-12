@@ -1,0 +1,51 @@
+﻿@model MiningOps.Models.SupplierContractViewModel
+
+@{
+    ViewData["Title"] = "Create Contract";
+    var suppliers = ViewData["Suppliers"] as List<MiningOps.Entity.Supplier>;
+}
+
+<div class="container mt-4">
+    <h2><i class="fas fa-plus-circle"></i> Create Supplier Contract</h2>
+    <form asp-action="Create" method="post" class="mt-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label class="form-label">Supplier</label>
+            <select asp-for="SupplierId" class="form-select">
+                <option value="">-- Select Supplier --</option>
+                @foreach (var s in suppliers)
+                {
+                    <option value="@s.SupplierId">@s.CompanyName</option>
+                }
+            </select>
+            <span asp-validation-for="SupplierId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ContractTerms" class="form-label"></label>
+            <textarea asp-for="ContractTerms" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="ContractTerms" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PaymentTerms" class="form-label"></label>
+            <input asp-for="PaymentTerms" class="form-control" />
+            <span asp-validation-for="PaymentTerms" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="StartDate" class="form-label"></label>
+                <input asp-for="StartDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="EndDate" class="form-label"></label>
+                <input asp-for="EndDate" type="date" class="form-control" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

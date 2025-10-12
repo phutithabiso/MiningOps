@@ -93,47 +93,20 @@ namespace MiningOps.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            // Save entity first to generate AccId
+            // Save entity to generate AccId
             _context.RegisterMiningDb.Add(user);
             await _context.SaveChangesAsync();
 
-            // Add role-specific profile
-            switch (user.Role)
+            // Redirect based on role
+            return user.Role switch
             {
-                case UserRole.Admin:
-                    _context.AdminProfiles.Add(new Admin
-                    {
-                        AccId = user.AccId,
-                        Department = "IT",
-                        CanManageUsers = true,
-                        CanApproveRequests = true
-                    });
-                    break;
-                case UserRole.Supervisor:
-                    _context.SupervisorProfiles.Add(new Supervisor
-                    {
-                        AccId = user.AccId,
-                        Team = "Operations",
-                        MineLocation = "Default Mine",
-                        Shift = "Day"
-                    });
-                    break;
-                case UserRole.Supplier:
-                    _context.SupplierProfiles.Add(new Supplier
-                    {
-                        AccId = user.AccId,
-                        CompanyName = "New Supplier",
-                        ContactPerson = user.FullName,
-                        Address = "Default Address"
-                    });
-                    break;
-            }
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "User created successfully!";
-            return RedirectToAction(nameof(Index));
+                UserRole.Admin => RedirectToAction("CompleteAdminProfile", "Account", new { id = user.AccId }),
+                UserRole.Supervisor => RedirectToAction("CompleteSupervisorProfile", "Account", new { id = user.AccId }),
+                UserRole.Supplier => RedirectToAction("CompleteSupplierProfile", "Account", new { id = user.AccId }),
+                _ => RedirectToAction("Index", "UserManagement")
+            };
         }
+
 
 
         // GET: UserManagement/Edit/5
