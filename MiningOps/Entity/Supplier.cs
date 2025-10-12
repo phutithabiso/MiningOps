@@ -30,8 +30,9 @@ namespace MiningOps.Entity
         public bool CanManageInventory { get; set; } = false;
 
         // Navigation
-        public ICollection<SupplierContract>? Contracts { get; set; }
-        public ICollection<SupplierPerformance>? Performances { get; set; }
+
         public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
+        public ICollection<SupplierContract> Contracts { get; set; } = new List<SupplierContract>();
+        public ICollection<SupplierPerformance> Performances { get; set; } = new List<SupplierPerformance>();
     }
 }
