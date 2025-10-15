@@ -48,7 +48,7 @@ namespace MiningOps.Migrations
                     b.HasIndex("AccId")
                         .IsUnique();
 
-                    b.ToTable("AdminProfiles");
+                    b.ToTable("AdminProfiles", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.InventoryItem", b =>
@@ -90,7 +90,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("InventoryDb");
+                    b.ToTable("InventoryDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Invoice", b =>
@@ -126,7 +126,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("InvoicesDb");
+                    b.ToTable("InvoicesDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.MaterialRequest", b =>
@@ -155,7 +155,7 @@ namespace MiningOps.Migrations
 
                     b.HasKey("MaterialRequestId");
 
-                    b.ToTable("MaterialRequestsDb");
+                    b.ToTable("MaterialRequestsDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.OrderItem", b =>
@@ -184,7 +184,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("OrderItemsDb");
+                    b.ToTable("OrderItemsDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Payment", b =>
@@ -216,7 +216,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("InvoiceId");
 
-                    b.ToTable("PaymentsDb");
+                    b.ToTable("PaymentsDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.PurchaseOrder", b =>
@@ -260,7 +260,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("PurchaseOrdersDb");
+                    b.ToTable("PurchaseOrdersDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.RegisterMining", b =>
@@ -312,7 +312,7 @@ namespace MiningOps.Migrations
 
                     b.HasKey("AccId");
 
-                    b.ToTable("RegisterMiningDb");
+                    b.ToTable("RegisterMiningDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Supervisor", b =>
@@ -349,7 +349,7 @@ namespace MiningOps.Migrations
                     b.HasIndex("AccId")
                         .IsUnique();
 
-                    b.ToTable("SupervisorProfiles");
+                    b.ToTable("SupervisorProfiles", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Supplier", b =>
@@ -389,7 +389,7 @@ namespace MiningOps.Migrations
                     b.HasIndex("AccId")
                         .IsUnique();
 
-                    b.ToTable("SupplierProfiles");
+                    b.ToTable("SupplierProfiles", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.SupplierContract", b =>
@@ -424,7 +424,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("SupplierContractDb");
+                    b.ToTable("SupplierContractDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.SupplierPerformance", b =>
@@ -456,7 +456,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("SupplierPerformanceDb");
+                    b.ToTable("SupplierPerformanceDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Warehouse", b =>
@@ -484,7 +484,7 @@ namespace MiningOps.Migrations
 
                     b.HasKey("WarehouseId");
 
-                    b.ToTable("WarehousesDb");
+                    b.ToTable("WarehousesDb", (string)null);
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Admin", b =>

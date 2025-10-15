@@ -129,51 +129,51 @@ namespace MiningOps.Controllers
         // POST: UserManagement/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, RegisterMining user)
+        public async Task<IActionResult> Edit(int id, RegisterMining model)
         {
-            if (id != user.AccId) return NotFound();
+            if (id != model.AccId) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(user);
-
-                    // Update role-specific profiles if needed
-                    switch (user.Role)
-                    {
-                        case UserRole.Admin:
-                            var adminProfile = await _context.AdminProfiles.FindAsync(user.AccId);
-                            if (adminProfile != null) _context.Update(adminProfile);
-                            break;
-
-                        case UserRole.Supervisor:
-                            var supervisorProfile = await _context.SupervisorProfiles.FindAsync(user.AccId);
-                            if (supervisorProfile != null) _context.Update(supervisorProfile);
-                            break;
-
-                        case UserRole.Supplier:
-                            var supplierProfile = await _context.SupplierProfiles.FindAsync(user.AccId);
-                            if (supplierProfile != null) _context.Update(supplierProfile);
-                            break;
-                    }
-
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.RegisterMiningDb.Any(e => e.AccId == user.AccId))
-                        return NotFound();
-                    else
-                        throw;
-                }
-
-                return RedirectToAction(nameof(Index));
+                ViewData["Roles"] = Enum.GetValues(typeof(UserRole)).Cast<UserRole>();
+                return View(model);
             }
 
-            ViewData["Roles"] = Enum.GetValues(typeof(UserRole)).Cast<UserRole>();
-            return View(user);
+            try
+            {
+                // Update user fields
+                var user = await _context.RegisterMiningDb.FirstOrDefaultAsync(u => u.AccId == id);
+                if (user == null) return NotFound();
+
+                user.FullName = model.FullName.Trim();
+                user.Username = model.Username.Trim();
+                user.Email = model.Email.Trim();
+                user.PhoneNumber = model.PhoneNumber.Trim();
+                user.Role = model.Role;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                // Redirect to role-specific profile edit page
+                return user.Role switch
+                {
+                    UserRole.Admin => RedirectToAction("EditAdminProfile", "Account", new { id = user.AccId }),
+                    UserRole.Supervisor => RedirectToAction("EditSupervisorProfile", "Account", new { id = user.AccId }),
+                    UserRole.Supplier => RedirectToAction("EditSupplierProfile", "Account", new { id = user.AccId }),
+                    _ => RedirectToAction("Index", "UserManagement")
+                };
+
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.RegisterMiningDb.Any(e => e.AccId == model.AccId))
+                    return NotFound();
+                else
+                    throw;
+            }
         }
+
+
 
         // GET: UserManagement/Delete/5
         public async Task<IActionResult> Delete(int? id)

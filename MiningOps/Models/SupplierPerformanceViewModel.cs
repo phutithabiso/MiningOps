@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace MiningOps.Models
 {
     public class SupplierPerformanceViewModel
     {
+        [Key]
         public int PerformanceId { get; set; }
 
         [Required(ErrorMessage = "Supplier is required")]
@@ -25,5 +27,6 @@ namespace MiningOps.Models
         [DataType(DataType.Date)]
         [Display(Name = "Report Date")]
         public DateTime ReportDate { get; set; } = DateTime.UtcNow;
+        public IEnumerable<SelectListItem> Suppliers { get; set; }
     }
 }

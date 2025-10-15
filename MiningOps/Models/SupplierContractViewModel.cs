@@ -4,7 +4,7 @@ namespace MiningOps.Models
 {
     public class SupplierContractViewModel
     {
-       // public int ContractId { get; set; }
+       public int ContractId { get; set; }
 
         [Required(ErrorMessage = "Supplier is required")]
         [Display(Name = "Supplier")]
@@ -25,5 +25,12 @@ namespace MiningOps.Models
         [DataType(DataType.Date)]
         [Display(Name = "End Date")]
         public DateTime? EndDate { get; set; }
+
+        [DataType(DataType.Currency)]
+        
+        [Range(0, double.MaxValue)]
+        public decimal ContractValue { get; set; }  // Use decimal for monetary precision
+        [Required]
+        public string ContractType { get; set; } = "unknown";
     }
 }

@@ -20,10 +20,12 @@ namespace MiningOps.Controllers
         public async Task<IActionResult> Index()
         {
             var contracts = await _context.SupplierContractDb
-                .Include(c => c.Supplier)
+                .Include(c => c.Supplier) 
                 .ToListAsync();
+
             return View(contracts);
         }
+
 
         // GET: SupplierContracts/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -44,7 +46,7 @@ namespace MiningOps.Controllers
         // GET: SupplierContracts/Create
         public IActionResult Create()
         {
-            ViewData["Suppliers"] = _context.SupplierProfiles.ToList();
+            ViewData["Suppliers"] = _context.SupplierProfiles.ToList() ?? new List<Supplier>();
             return View();
         }
 
@@ -61,7 +63,10 @@ namespace MiningOps.Controllers
                     ContractTerms = model.ContractTerms,
                     PaymentTerms = model.PaymentTerms,
                     StartDate = model.StartDate,
-                    EndDate = model.EndDate
+                    EndDate = model.EndDate,
+                    ContractValue = model.ContractValue,
+                    ContractType =model.ContractType
+
                 };
 
                 _context.Add(contract);
@@ -69,7 +74,9 @@ namespace MiningOps.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["Suppliers"] = _context.SupplierProfiles.ToList();
+            ViewData["Suppliers"] = _context.SupplierProfiles.ToList() ?? new List<Supplier>();
+           
+
             return View(model);
         }
 
@@ -90,10 +97,14 @@ namespace MiningOps.Controllers
                 ContractTerms = contract.ContractTerms,
                 PaymentTerms = contract.PaymentTerms,
                 StartDate = contract.StartDate,
-                EndDate = contract.EndDate
+                EndDate = contract.EndDate,
+                ContractValue = contract.ContractValue ?? 0m,
+                ContractType = contract.ContractType
             };
 
-            ViewData["Suppliers"] = _context.SupplierProfiles.ToList();
+           // ViewData["Suppliers"] = _context.SupplierProfiles.ToList();
+            ViewData["Suppliers"] = _context.SupplierProfiles.ToList() ?? new List<Supplier>();
+
             return View(model);
         }
 
@@ -112,13 +123,14 @@ namespace MiningOps.Controllers
                     var contract = await _context.SupplierContractDb.FindAsync(id);
                     if (contract == null)
                         return NotFound();
-
+                    
                     contract.SupplierId = model.SupplierId;
                     contract.ContractTerms = model.ContractTerms;
                     contract.PaymentTerms = model.PaymentTerms;
                     contract.StartDate = model.StartDate;
                     contract.EndDate = model.EndDate;
-
+                    contract.ContractValue = model.ContractValue;
+                    contract.ContractType = model.ContractType;
                     _context.Update(contract);
                     await _context.SaveChangesAsync();
                 }

@@ -1,0 +1,356 @@
+﻿@model MiningOps.Models.SupplierPerformanceViewModel
+
+@{
+    ViewData["Title"] = "Add Supplier Performance";
+}
+<partial name="_Messages" />
+
+<div class="page-header">
+    <h1><i class="fas fa-chart-line"></i> Add Supplier Performance</h1>
+    <p class="lead">Track and record supplier performance metrics</p>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> Performance Metrics</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" class="form-container">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row">
+                <!-- Left Column - Basic Information -->
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label asp-for="SupplierId" class="form-label">
+                            <i class="fas fa-truck"></i> Supplier
+                        </label>
+                        <select asp-for="SupplierId" class="form-select form-select-lg" asp-items="Model.Suppliers">
+                            <option value="">-- Select Supplier --</option>
+                        </select>
+                        <span asp-validation-for="SupplierId" class="text-danger validation-message"></span>
+                    </div>
+
+
+                    <div class="form-group mb-4">
+                        <label asp-for="ReportDate" class="form-label">
+                            <i class="fas fa-calendar-alt"></i> Report Date
+                        </label>
+                        <input asp-for="ReportDate" type="date" class="form-control form-control-lg"
+                               value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="ReportDate" class="text-danger validation-message"></span>
+                    </div>
+
+                    <!-- Performance Summary Card -->
+                    <div class="performance-summary-card p-3 rounded mb-4">
+                        <h6><i class="fas fa-chart-bar"></i> Performance Summary</h6>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="performance-score" id="deliveryScore">
+                                    <div class="score-value">0%</div>
+                                    <small class="text-muted">On-Time Delivery</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="performance-score" id="qualityScore">
+                                    <div class="score-value">0/5</div>
+                                    <small class="text-muted">Quality</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="performance-score" id="complianceScore">
+                                    <div class="score-value">0%</div>
+                                    <small class="text-muted">Compliance</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <div class="performance-rating">
+                                <small class="text-muted">Overall Rating:</small>
+                                <div id="overallRating" class="fw-bold text-warning">Not Rated</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Performance Metrics -->
+                <div class="col-md-6">
+                    <!-- On-Time Delivery Rate -->
+                    <div class="form-group mb-4">
+                        <label asp-for="OnTimeDeliveryRate" class="form-label">
+                            <i class="fas fa-shipping-fast"></i> On-Time Delivery Rate
+                        </label>
+                        <div class="input-group">
+                            <input asp-for="OnTimeDeliveryRate" class="form-control form-control-lg"
+                                   type="number" min="0" max="100" step="0.1"
+                                   placeholder="Enter percentage (0-100)" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <span asp-validation-for="OnTimeDeliveryRate" class="text-danger validation-message"></span>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> Percentage of orders delivered on time
+                            </small>
+                            <div class="delivery-rating mt-1">
+                                <span class="badge bg-danger delivery-badge" data-min="0" data-max="79">Poor (&lt;80%)</span>
+                                <span class="badge bg-warning delivery-badge" data-min="80" data-max="89">Good (80-89%)</span>
+                                <span class="badge bg-success delivery-badge" data-min="90" data-max="100">Excellent (90%+)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quality Rating -->
+                    <div class="form-group mb-4">
+                        <label asp-for="QualityRating" class="form-label">
+                            <i class="fas fa-award"></i> Quality Rating
+                        </label>
+                        <div class="quality-rating-input">
+                            <input asp-for="QualityRating" type="range" class="form-range" min="1" max="5" step="1" value="3">
+                            <div class="rating-labels d-flex justify-content-between">
+                                <small class="text-muted">1 - Poor</small>
+                                <small class="text-muted">2 - Fair</small>
+                                <small class="text-muted">3 - Good</small>
+                                <small class="text-muted">4 - Very Good</small>
+                                <small class="text-muted">5 - Excellent</small>
+                            </div>
+                            <div class="text-center mt-2">
+                                <span id="qualityDisplay" class="badge bg-primary fs-6">3 - Good</span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="QualityRating" class="text-danger validation-message"></span>
+                    </div>
+
+                    <!-- Compliance Score -->
+                    <div class="form-group mb-4">
+                        <label asp-for="ComplianceScore" class="form-label">
+                            <i class="fas fa-clipboard-list"></i> Compliance Score
+                        </label>
+                        <div class="input-group">
+                            <input asp-for="ComplianceScore" class="form-control form-control-lg"
+                                   type="number" min="0" max="100" step="0.1"
+                                   placeholder="Enter percentage (0-100)" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <span asp-validation-for="ComplianceScore" class="text-danger validation-message"></span>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> Adherence to contract terms and regulations
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes Section -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="form-group mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-sticky-note"></i> Additional Notes (Optional)
+                        </label>
+                        <textarea class="form-control" rows="3" placeholder="Add any additional comments or observations about this supplier's performance..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-plus-circle"></i> Create Performance Record
+                </button>
+                <a asp-action="Index" class="btn btn-secondary btn-lg ms-2">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <button type="reset" class="btn btn-outline-warning btn-lg ms-2">
+                    <i class="fas fa-undo"></i> Reset Form
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Performance Guidelines Card -->
+<div class="card mt-4 shadow-sm">
+    <div class="card-header bg-light">
+        <h6 class="mb-0"><i class="fas fa-question-circle"></i> Performance Rating Guidelines</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <h6>On-Time Delivery</h6>
+                <ul class="small">
+                    <li><strong>Excellent (90-100%):</strong> Consistently meets or exceeds delivery deadlines</li>
+                    <li><strong>Good (80-89%):</strong> Generally reliable with occasional delays</li>
+                    <li><strong>Poor (&lt;80%):</strong> Frequent delays affecting operations</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6>Quality Rating</h6>
+                <ul class="small">
+                    <li><strong>5 - Excellent:</strong> Exceptional quality, exceeds expectations</li>
+                    <li><strong>4 - Very Good:</strong> High quality, minor issues</li>
+                    <li><strong>3 - Good:</strong> Meets standards, acceptable quality</li>
+                    <li><strong>2 - Fair:</strong> Below standards, needs improvement</li>
+                    <li><strong>1 - Poor:</strong> Unacceptable quality, major issues</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6>Compliance Score</h6>
+                <ul class="small">
+                    <li><strong>Excellent (90-100%):</strong> Full compliance with all requirements</li>
+                    <li><strong>Good (80-89%):</strong> Minor compliance issues</li>
+                    <li><strong>Needs Improvement (&lt;80%):</strong> Significant compliance concerns</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get form elements
+            const deliveryInput = document.querySelector('input[name="OnTimeDeliveryRate"]');
+            const qualityInput = document.querySelector('input[name="QualityRating"]');
+            const qualityDisplay = document.getElementById('qualityDisplay');
+            const complianceInput = document.querySelector('input[name="ComplianceScore"]');
+
+            // Performance summary elements
+            const deliveryScore = document.getElementById('deliveryScore').querySelector('.score-value');
+            const qualityScore = document.getElementById('qualityScore').querySelector('.score-value');
+            const complianceScore = document.getElementById('complianceScore').querySelector('.score-value');
+            const overallRating = document.getElementById('overallRating');
+
+            // Quality rating labels
+            const qualityLabels = {
+                1: '1 - Poor',
+                2: '2 - Fair',
+                3: '3 - Good',
+                4: '4 - Very Good',
+                5: '5 - Excellent'
+            };
+
+            // Update quality rating display
+            function updateQualityDisplay() {
+                const value = parseInt(qualityInput.value);
+                qualityDisplay.textContent = qualityLabels[value] || '3 - Good';
+
+                // Update quality badge color
+                const badgeClasses = ['bg-danger', 'bg-warning', 'bg-primary', 'bg-info', 'bg-success'];
+                qualityDisplay.className = `badge ${badgeClasses[value - 1] || 'bg-primary'} fs-6`;
+            }
+
+            // Update performance summary
+            function updatePerformanceSummary() {
+                const deliveryValue = deliveryInput.value ? parseFloat(deliveryInput.value) : 0;
+                const qualityValue = qualityInput.value ? parseInt(qualityInput.value) : 0;
+                const complianceValue = complianceInput.value ? parseFloat(complianceInput.value) : 0;
+
+                // Update scores
+                deliveryScore.textContent = deliveryValue ? deliveryValue.toFixed(1) + '%' : '0%';
+                qualityScore.textContent = qualityValue ? qualityValue + '/5' : '0/5';
+                complianceScore.textContent = complianceValue ? complianceValue.toFixed(1) + '%' : '0%';
+
+                // Calculate overall rating
+                if (deliveryValue > 0 || qualityValue > 0 || complianceValue > 0) {
+                    const avgScore = (deliveryValue + (qualityValue * 20) + complianceValue) / 3;
+                    let rating, color;
+
+                    if (avgScore >= 90) {
+                        rating = 'Excellent';
+                        color = 'text-success';
+                    } else if (avgScore >= 80) {
+                        rating = 'Good';
+                        color = 'text-info';
+                    } else if (avgScore >= 70) {
+                        rating = 'Fair';
+                        color = 'text-warning';
+                    } else {
+                        rating = 'Poor';
+                        color = 'text-danger';
+                    }
+
+                    overallRating.textContent = rating;
+                    overallRating.className = `fw-bold ${color}`;
+                } else {
+                    overallRating.textContent = 'Not Rated';
+                    overallRating.className = 'fw-bold text-warning';
+                }
+            }
+
+            // Update delivery rating badges
+            function updateDeliveryRating() {
+                const value = deliveryInput.value ? parseFloat(deliveryInput.value) : 0;
+                const badges = document.querySelectorAll('.delivery-badge');
+
+                badges.forEach(badge => {
+                    const min = parseInt(badge.getAttribute('data-min'));
+                    const max = parseInt(badge.getAttribute('data-max'));
+
+                    if (value >= min && value <= max) {
+                        badge.classList.add('active-badge');
+                    } else {
+                        badge.classList.remove('active-badge');
+                    }
+                });
+            }
+
+            // Event listeners
+            deliveryInput.addEventListener('input', function() {
+                this.classList.toggle('is-valid', this.value.trim() !== '');
+                updatePerformanceSummary();
+                updateDeliveryRating();
+            });
+
+            qualityInput.addEventListener('input', function() {
+                updateQualityDisplay();
+                updatePerformanceSummary();
+            });
+
+            complianceInput.addEventListener('input', function() {
+                this.classList.toggle('is-valid', this.value.trim() !== '');
+                updatePerformanceSummary();
+            });
+
+            // Real-time validation for all inputs
+            const inputs = document.querySelectorAll('.form-control, .form-select');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    this.classList.toggle('is-valid', this.value.trim() !== '');
+                    this.classList.toggle('is-invalid', this.value.trim() === '');
+                });
+
+                input.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.add('is-valid');
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+
+            // Form submission enhancement
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Record...';
+            });
+
+            // Initialize displays
+            updateQualityDisplay();
+            updatePerformanceSummary();
+            updateDeliveryRating();
+        });
+    </script>
+}
+
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="~/css/site1.css" asp-append-version="true" />

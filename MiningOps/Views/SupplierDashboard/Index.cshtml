@@ -1,0 +1,384 @@
+﻿@model IEnumerable<MiningOps.Models.SupplierDashboardViewModel>
+
+@{
+    ViewData["Title"] = "Supplier Dashboard";
+}
+
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1><i class="fas fa-tachometer-alt"></i> Supplier Dashboard</h1>
+            <p class="lead text-muted">Complete overview of supplier performance and contracts</p>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group">
+               
+                <a asp-controller="SupplierContracts" asp-action="Create" class="btn btn-success">
+                    <i class="fas fa-file-contract"></i> New Contract
+                </a>
+                <a asp-controller="SupplierPerformance" asp-action="Create" class="btn btn-info">
+                    <i class="fas fa-chart-line"></i> Add Performance
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Action Buttons -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-auto">
+                        <h6 class="mb-2">Quick Actions:</h6>
+                    </div>
+                    <div class="col-auto">
+                        <a asp-controller="SupplierProfiles" asp-action="Index" class="btn btn-outline-primary">
+                            <i class="fas fa-building"></i> All Suppliers
+                        </a>
+                    </div>
+                    <div class="col-auto">
+                        <a asp-controller="SupplierContracts" asp-action="Index" class="btn btn-outline-success">
+                            <i class="fas fa-file-contract"></i> All Contracts
+                        </a>
+                    </div>
+                    <div class="col-auto">
+                        <a asp-controller="SupplierPerformance" asp-action="Index" class="btn btn-outline-info">
+                            <i class="fas fa-chart-bar"></i> All Performance
+                        </a>
+                    </div>
+                    <div class="col-auto">
+                        <a href="#" class="btn btn-outline-warning">
+                            <i class="fas fa-download"></i> Export Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Statistics -->
+<div class="row mb-4">
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card bg-primary text-white mb-3">
+            <div class="card-body text-center p-3">
+                <div class="h4 mb-0">@Model.Count()</div>
+                <small>Total Suppliers</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card bg-success text-white mb-3">
+            <div class="card-body text-center p-3">
+                <div class="h4 mb-0">@Model.Sum(s => s.ActiveContractCount)</div>
+                <small>Active Contracts</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card bg-warning text-white mb-3">
+            <div class="card-body text-center p-3">
+                <div class="h4 mb-0">@Model.Sum(s => s.ExpiringContractCount)</div>
+                <small>Expiring Soon</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card bg-info text-white mb-3">
+            <div class="card-body text-center p-3">
+                <div class="h4 mb-0">@Model.Average(s => s.AverageQualityRating).ToString("F1")</div>
+                <small>Avg Quality</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card bg-secondary text-white mb-3">
+            <div class="card-body text-center p-3">
+                <div class="h4 mb-0">@Model.Average(s => s.AverageDeliveryRate).ToString("P1")</div>
+                <small>Avg Delivery</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card bg-dark text-white mb-3">
+            <div class="card-body text-center p-3">
+                <div class="h4 mb-0">@Model.Count(s => s.ActiveContractCount > 0)</div>
+                <small>Active Suppliers</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Suppliers Table -->
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-industry"></i> Supplier Summary</h5>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-light" onclick="window.location.reload()" title="Refresh">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            <a href="#" class="btn btn-sm btn-light" title="Export Data">
+                <i class="fas fa-download"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Supplier</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Contracts</th>
+                        <th class="text-center">Expiring</th>
+                        <th>Quality Rating</th>
+                        <th>Delivery Rate</th>
+                        <th>Performance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var overallScore = (item.AverageDeliveryRate + (decimal)item.AverageQualityRating) / 2;
+                            var performanceClass = overallScore >= 8.0m ? "success" :
+                            overallScore >= 6.0m ? "warning" : "danger";
+                            var performanceText = overallScore >= 8.0m ? "Excellent" :
+                            overallScore >= 6.0m ? "Good" : "Needs Improvement";
+
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-primary">@item.SupplierName</div>
+                                    <div class="small text-muted">
+                                        <i class="fas fa-user me-1"></i>@item.ContactPerson
+                                    </div>
+                                    <div class="small text-muted">
+                                        <i class="fas fa-phone me-1"></i>@item.SupplierName
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge @(item.ActiveContractCount > 0 ? "bg-success" : "bg-secondary")">
+                                        @(item.ActiveContractCount > 0 ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge bg-info">@item.TotalContractCount</span>
+                                    <div class="small text-success">@item.ActiveContractCount active</div>
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.ExpiringContractCount > 0)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>@item.ExpiringContractCount
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@item.ExpiringContractCount</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="fw-bold me-2">@item.AverageQualityRating.ToString("F1")</span>
+                                        <div class="rating">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= Math.Round(item.AverageQualityRating / 2))
+                                                {
+                                                    <i class="fas fa-star text-warning"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star text-warning"></i>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td style="min-width: 140px;">
+                                    <div class="progress mb-1" style="height: 20px;">
+                                        <div class="progress-bar @(item.AverageDeliveryRate >= 0.9m ? "bg-success" : (item.AverageDeliveryRate >= 0.7m ? "bg-warning" : "bg-danger"))"
+                                             style="width: @(Convert.ToDouble(item.AverageDeliveryRate * 100))%">
+                                            @(item.AverageDeliveryRate.ToString("P0"))
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">@(item.AverageDeliveryRate.ToString("P1"))</small>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-@performanceClass">@performanceText</span>
+                                </td>
+
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <!-- View Details -->
+                                        <a asp-action="Details" asp-route-id="@item.SupId" class="btn btn-outline-info"
+                                           data-bs-toggle="tooltip" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <!-- View Contracts -->
+                                        <a asp-action="Contracts" asp-route-id="@item.SupId" class="btn btn-outline-primary"
+                                           data-bs-toggle="tooltip" title="View Contracts">
+                                            <i class="fas fa-file-contract"></i>
+                                        </a>
+
+                                        <!-- View Performance -->
+                                        <a asp-action="Performance" asp-route-id="@item.SupId" class="btn btn-outline-success"
+                                           data-bs-toggle="tooltip" title="View Performance">
+                                            <i class="fas fa-chart-line"></i>
+                                        </a>
+
+                                        <!-- Edit Supplier -->
+                                        <a asp-controller="SupplierProfiles" asp-action="Edit" asp-route-id="@item.SupId"
+                                           class="btn btn-outline-warning" data-bs-toggle="tooltip" title="Edit Supplier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <!-- Add Contract -->
+                                        <a asp-controller="SupplierContracts" asp-action="Create" asp-route-supplierId="@item.SupId"
+                                           class="btn btn-outline-success" data-bs-toggle="tooltip" title="Add Contract">
+                                            <i class="fas fa-plus-circle"></i>
+                                        </a>
+
+                                        <!-- Add Performance -->
+                                        <a asp-controller="SupplierPerformance" asp-action="Create" asp-route-supplierId="@item.SupId"
+                                           class="btn btn-outline-info" data-bs-toggle="tooltip" title="Add Performance">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                                <h5>No supplier data available</h5>
+                                <p class="mb-0">Get started by adding your first supplier.</p>
+                                <div class="mt-3">
+                                    <a asp-controller="SupplierProfiles" asp-action="Create" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Add First Supplier
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="card-footer bg-light">
+            <div class="row align-items-center">
+                <div class="col">
+                    <small class="text-muted">
+                        Showing <strong>@Model.Count()</strong> suppliers •
+                        <strong>@Model.Sum(s => s.ActiveContractCount)</strong> active contracts •
+                        <strong>@Model.Sum(s => s.ExpiringContractCount)</strong> expiring soon
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small class="text-muted">
+                        Last updated: @DateTime.Now.ToString("MMM dd, yyyy HH:mm")
+                    </small>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Additional Action Buttons Section -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Quick Contracts</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-controller="SupplierContracts" asp-action="Create" class="btn btn-warning">
+                        <i class="fas fa-plus-circle me-2"></i>Create New Contract
+                    </a>
+                    <a asp-controller="SupplierContracts" asp-action="Index" class="btn btn-outline-warning">
+                        <i class="fas fa-list me-2"></i>View All Contracts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="fas fa-chart-line"></i> Performance Tracking</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-controller="SupplierPerformance" asp-action="Create" class="btn btn-info">
+                        <i class="fas fa-plus-circle me-2"></i>Add Performance Record
+                    </a>
+                    <a asp-controller="SupplierPerformance" asp-action="Index" class="btn btn-outline-info">
+                        <i class="fas fa-list me-2"></i>View All Performance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .rating {
+            font-size: 0.8rem;
+        }
+
+        .table th {
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress {
+            border-radius: 4px;
+        }
+
+        .badge {
+            font-size: 0.75em;
+        }
+
+        .btn-group-sm > .btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .card-header {
+            border-bottom: 1px solid rgba(0,0,0,.125);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+}

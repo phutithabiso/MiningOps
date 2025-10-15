@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -19,5 +20,6 @@ namespace MiningOps.Entity
         public int QualityRating { get; set; } = 0; // 0..5
         public decimal ComplianceScore { get; set; } = 0m;
         public DateTime ReportDate { get; set; } = DateTime.UtcNow;
+
     }
 }

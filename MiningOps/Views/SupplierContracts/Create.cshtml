@@ -1,51 +1,508 @@
 ﻿@model MiningOps.Models.SupplierContractViewModel
 
 @{
-    ViewData["Title"] = "Create Contract";
+    ViewData["Title"] = "Create Supplier Contract";
     var suppliers = ViewData["Suppliers"] as List<MiningOps.Entity.Supplier>;
 }
-
-<div class="container mt-4">
-    <h2><i class="fas fa-plus-circle"></i> Create Supplier Contract</h2>
-    <form asp-action="Create" method="post" class="mt-3">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <div class="mb-3">
-            <label class="form-label">Supplier</label>
-            <select asp-for="SupplierId" class="form-select">
-                <option value="">-- Select Supplier --</option>
-                @foreach (var s in suppliers)
-                {
-                    <option value="@s.SupplierId">@s.CompanyName</option>
-                }
-            </select>
-            <span asp-validation-for="SupplierId" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="ContractTerms" class="form-label"></label>
-            <textarea asp-for="ContractTerms" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="ContractTerms" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="PaymentTerms" class="form-label"></label>
-            <input asp-for="PaymentTerms" class="form-control" />
-            <span asp-validation-for="PaymentTerms" class="text-danger"></span>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label asp-for="StartDate" class="form-label"></label>
-                <input asp-for="StartDate" type="date" class="form-control" />
-            </div>
-            <div class="col-md-6 mb-3">
-                <label asp-for="EndDate" class="form-label"></label>
-                <input asp-for="EndDate" type="date" class="form-control" />
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-    </form>
+<partial name="_Messages" />
+<div class="page-header">
+    <h1><i class="fas fa-file-contract"></i> Create Supplier Contract</h1>
+    <p class="lead">Establish a new contractual agreement with a supplier</p>
 </div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-edit"></i> Contract Details</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post" class="form-container">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row">
+                <!-- Left Column - Basic Information -->
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label asp-for="SupplierId" class="form-label">
+                            <i class="fas fa-truck"></i> Supplier
+                        </label>
+                        <select asp-for="SupplierId" class="form-select form-select-lg supplier-select">
+                            <option value="">-- Select Supplier --</option>
+                            @if (suppliers != null && suppliers.Any())
+                            {
+                                foreach (var supplier in suppliers)
+                                {
+                                    // Use null-conditional operators to prevent null reference
+                                    var profile = supplier.RegisterMining;
+                                    <option value="@supplier.SupplierId"
+                                            data-email="@(profile?.Email ?? "-")"
+                                            data-phone="@(profile?.PhoneNumber ?? "-")"
+                                            data-address="@(supplier.Address ?? "-")">
+                                        @(profile?.FullName ?? supplier.CompanyName ?? "Unknown")
+                                    </option>
+                                }
+                            }
+                            else
+                            {
+                                <option disabled>No suppliers available</option>
+                            }
+                        </select>
+
+                        <span asp-validation-for="SupplierId" class="text-danger validation-message"></span>
+
+                        <!-- Supplier Information Card -->
+                        <div id="supplierInfo" class="supplier-info-card mt-3 p-3 rounded border d-none">
+                            <h6><i class="fas fa-info-circle"></i> Supplier Information</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small class="text-muted">Email:</small>
+                                    <div id="supplierEmail" class="fw-bold">-</div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Phone:</small>
+                                    <div id="supplierPhone" class="fw-bold">-</div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">Address:</small>
+                                <div id="supplierAddress" class="small">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                
+                    <div class="form-group mb-4">
+                        <label asp-for="PaymentTerms" class="form-label">
+                            <i class="fas fa-money-bill-wave"></i> Payment Terms
+                        </label>
+                        <select asp-for="PaymentTerms" class="form-select form-select-lg">
+                            <option value="">-- Select Payment Terms --</option>
+                            <option value="Net 30">Net 30</option>
+                            <option value="Net 60">Net 60</option>
+                            <option value="Net 90">Net 90</option>
+                            <option value="50% Advance, 50% on Delivery">50% Advance, 50% on Delivery</option>
+                            <option value="100% Advance">100% Advance</option>
+                            <option value="100% on Delivery">100% on Delivery</option>
+                            <option value="Custom">Custom Terms</option>
+                        </select>
+                        <div id="customPaymentTerms" class="mt-2 d-none">
+                            <input type="text" class="form-control" placeholder="Enter custom payment terms..." />
+                        </div>
+                        <span asp-validation-for="PaymentTerms" class="text-danger validation-message"></span>
+                    </div>
+                </div>
+
+                <!-- Right Column - Contract Dates -->
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label asp-for="StartDate" class="form-label">
+                            <i class="fas fa-calendar-plus"></i> Start Date
+                        </label>
+                        <input asp-for="StartDate" type="date" class="form-control form-control-lg start-date"
+                               min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="StartDate" class="text-danger validation-message"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="EndDate" class="form-label">
+                            <i class="fas fa-calendar-minus"></i> End Date
+                        </label>
+                        <input asp-for="EndDate" type="date" class="form-control form-control-lg end-date" />
+                        <span asp-validation-for="EndDate" class="text-danger validation-message"></span>
+                    </div>
+
+                    <!-- Contract Duration Calculator -->
+                    <div class="contract-duration-card p-3 rounded mb-4">
+                        <h6><i class="fas fa-calculator"></i> Contract Duration</h6>
+                        <div class="duration-display text-center">
+                            <div id="durationValue" class="fw-bold fs-4 text-primary">0 days</div>
+                            <small class="text-muted">Total contract period</small>
+                        </div>
+                        <div class="mt-2">
+                            <div class="progress" style="height: 8px;">
+                                <div id="durationProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="text-muted" id="durationStatus">Set start and end dates</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contract Terms Section -->
+            <div class="form-group mb-4">
+                <label asp-for="ContractTerms" class="form-label">
+                    <i class="fas fa-gavel"></i> Contract Terms & Conditions
+                </label>
+                <textarea asp-for="ContractTerms" class="form-control form-control-lg contract-terms"
+                          rows="6" placeholder="Enter detailed contract terms, conditions, deliverables, and obligations..."></textarea>
+                <span asp-validation-for="ContractTerms" class="text-danger validation-message"></span>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <i class="fas fa-lightbulb"></i> Tip: Include scope of work, deliverables, quality standards,
+                        confidentiality clauses, and termination conditions.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Contract Value & Additional Details -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-dollar-sign"></i> Contract Value (Optional)
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control form-control-lg"
+                                   placeholder="0.00" step="0.01" min="0" />
+                            <span class="input-group-text">.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-tags"></i> Contract Type
+                        </label>
+                        <select class="form-select form-select-lg">
+                            <option value="">-- Select Contract Type --</option>
+                            <option value="Fixed Price">Fixed Price</option>
+                            <option value="Time and Materials">Time and Materials</option>
+                            <option value="Retainer">Retainer</option>
+                            <option value="Master Service Agreement">Master Service Agreement</option>
+                            <option value="Purchase Order">Purchase Order</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms Templates -->
+            <div class="terms-templates mb-4">
+                <label class="form-label">
+                    <i class="fas fa-magic"></i> Quick Templates
+                </label>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-outline-primary btn-sm template-btn" data-template="standard">
+                        Standard Terms
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm template-btn" data-template="confidentiality">
+                        Confidentiality
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm template-btn" data-template="delivery">
+                        Delivery Terms
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm template-btn" data-template="quality">
+                        Quality Standards
+                    </button>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-file-signature"></i> Create Contract
+                </button>
+                <a asp-action="Index" class="btn btn-secondary btn-lg ms-2">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="button" class="btn btn-outline-info btn-lg ms-2" id="previewContract">
+                    <i class="fas fa-eye"></i> Preview
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Contract Guidelines -->
+<div class="card mt-4 shadow-sm">
+    <div class="card-header bg-light">
+        <h6 class="mb-0"><i class="fas fa-lightbulb"></i> Contract Creation Guidelines</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Best Practices</h6>
+                <ul class="small">
+                    <li>Clearly define scope of work and deliverables</li>
+                    <li>Specify payment terms and schedules</li>
+                    <li>Include quality standards and acceptance criteria</li>
+                    <li>Define confidentiality and IP protection clauses</li>
+                    <li>Specify termination conditions and notice periods</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Legal Considerations</h6>
+                <ul class="small">
+                    <li>Ensure all terms comply with local regulations</li>
+                    <li>Include dispute resolution mechanisms</li>
+                    <li>Specify governing law and jurisdiction</li>
+                    <li>Include liability and indemnification clauses</li>
+                    <li>Define force majeure conditions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Supplier selection handler
+            const supplierSelect = document.querySelector('.supplier-select');
+            const supplierInfo = document.getElementById('supplierInfo');
+            const supplierEmail = document.getElementById('supplierEmail');
+            const supplierPhone = document.getElementById('supplierPhone');
+            const supplierAddress = document.getElementById('supplierAddress');
+
+            supplierSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+
+                if (selectedOption.value) {
+                    supplierEmail.textContent = selectedOption.getAttribute('data-email') || '-';
+                    supplierPhone.textContent = selectedOption.getAttribute('data-phone') || '-';
+                    supplierAddress.textContent = selectedOption.getAttribute('data-address') || '-';
+                    supplierInfo.classList.remove('d-none');
+                } else {
+                    supplierInfo.classList.add('d-none');
+                }
+            });
+
+            // Payment terms handler
+            const paymentTermsSelect = document.querySelector('select[name="PaymentTerms"]');
+            const customPaymentTerms = document.getElementById('customPaymentTerms');
+
+            paymentTermsSelect.addEventListener('change', function() {
+                if (this.value === 'Custom') {
+                    customPaymentTerms.classList.remove('d-none');
+                } else {
+                    customPaymentTerms.classList.add('d-none');
+                }
+            });
+
+            // Contract duration calculator
+            const startDateInput = document.querySelector('.start-date');
+            const endDateInput = document.querySelector('.end-date');
+            const durationValue = document.getElementById('durationValue');
+            const durationProgress = document.getElementById('durationProgress');
+            const durationStatus = document.getElementById('durationStatus');
+
+            function calculateDuration() {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+
+                if (startDateInput.value && endDateInput.value && endDate > startDate) {
+                    const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                    durationValue.textContent = duration + ' days';
+
+                    // Progress calculation (assuming max 365 days for 100%)
+                    const progress = Math.min((duration / 365) * 100, 100);
+                    durationProgress.style.width = progress + '%';
+
+                    // Progress bar color based on duration
+                    if (duration > 365) {
+                        durationProgress.className = 'progress-bar bg-warning';
+                        durationStatus.textContent = 'Long-term contract (>1 year)';
+                    } else if (duration > 180) {
+                        durationProgress.className = 'progress-bar bg-info';
+                        durationStatus.textContent = 'Medium-term contract (6-12 months)';
+                    } else {
+                        durationProgress.className = 'progress-bar bg-success';
+                        durationStatus.textContent = 'Short-term contract (<6 months)';
+                    }
+                } else {
+                    durationValue.textContent = '0 days';
+                    durationProgress.style.width = '0%';
+                    durationStatus.textContent = 'Set start and end dates';
+                }
+            }
+
+            startDateInput.addEventListener('change', function() {
+                if (this.value) {
+                    endDateInput.min = this.value;
+                    calculateDuration();
+                }
+            });
+
+            endDateInput.addEventListener('change', calculateDuration);
+
+            // Terms templates
+            const templateButtons = document.querySelectorAll('.template-btn');
+            const contractTermsTextarea = document.querySelector('.contract-terms');
+
+            const templates = {
+                standard: "1. Scope of Work: The Supplier shall provide the services as described in Exhibit A.\n2. Term: This Agreement shall commence on the Start Date and continue until the End Date.\n3. Payment: Payment shall be made according to the specified payment terms.\n4. Confidentiality: Both parties agree to maintain the confidentiality of proprietary information.",
+                confidentiality: "Confidentiality: The Supplier shall not disclose any confidential information received from the Company to any third party and shall use such information only for the purpose of fulfilling its obligations under this Agreement. This obligation shall survive the termination of this Agreement.",
+                delivery: "Delivery: All deliverables shall be completed and delivered by the specified deadlines. Late deliveries may result in penalties as specified in the payment terms. The Supplier shall provide regular progress updates throughout the contract period.",
+                quality: "Quality Standards: All work performed and deliverables provided shall meet industry standards and specifications outlined in this Agreement. The Company reserves the right to inspect and reject any work that does not meet the agreed-upon quality standards."
+            };
+
+            templateButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const templateType = this.getAttribute('data-template');
+                    const currentText = contractTermsTextarea.value;
+                    const templateText = templates[templateType];
+
+                    if (currentText) {
+                        contractTermsTextarea.value = currentText + '\n\n' + templateText;
+                    } else {
+                        contractTermsTextarea.value = templateText;
+                    }
+
+                    // Highlight the textarea to show it's been updated
+                    contractTermsTextarea.focus();
+                });
+            });
+
+            // Form validation and enhancement
+            const inputs = document.querySelectorAll('.form-control, .form-select');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    this.classList.toggle('is-valid', this.value.trim() !== '');
+                    this.classList.toggle('is-invalid', this.value.trim() === '');
+                });
+
+                input.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.add('is-valid');
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+
+            // Form submission enhancement
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Contract...';
+            });
+
+            // Preview contract button
+            document.getElementById('previewContract').addEventListener('click', function() {
+                alert('Contract preview functionality would open a formatted view of the contract details.');
+                // In a real implementation, this would open a modal or new page with a formatted contract preview
+            });
+        });
+    </script>
+}
+
+<style>
+    .form-container {
+        max-width: 100%;
+    }
+
+    .form-control-lg, .form-select-lg {
+        border-radius: 0.5rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+        .form-control-lg:focus, .form-select-lg:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .form-control-lg.is-valid {
+            border-color: #28a745;
+        }
+
+        .form-control-lg.is-invalid {
+            border-color: #dc3545;
+        }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+        .form-label i {
+            width: 20px;
+            margin-right: 8px;
+            color: #6c757d;
+        }
+
+    .supplier-info-card {
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+        transition: all 0.3s ease;
+    }
+
+    .contract-duration-card {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: 1px solid #dee2e6;
+    }
+
+    .validation-message {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        border: none;
+        border-radius: 1rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border-radius: 1rem 1rem 0 0 !important;
+        padding: 1.25rem;
+    }
+
+        .card-header.bg-light {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+        }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .terms-templates .template-btn {
+        font-size: 0.875rem;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 150px;
+    }
+
+    .progress {
+        border-radius: 4px;
+    }
+
+    .progress-bar {
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+
+   
+
+    .input-group-text {
+        background-color: #e9ecef;
+        border: 2px solid #e9ecef;
+    }
+
+    .input-group .form-control {
+        border-right: none;
+    }
+
+        .input-group .form-control:focus {
+            border-right: 2px solid #007bff;
+        }
+</style>
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Bootstrap CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">

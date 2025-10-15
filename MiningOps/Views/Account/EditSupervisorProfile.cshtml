@@ -1,0 +1,59 @@
+﻿@model MiningOps.Entity.Supervisor
+
+@{
+    ViewData["Title"] = "Edit Supervisor Profile";
+}
+<partial name="_Messages" />
+
+<h1>Edit Supervisor Profile</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditSupervisorProfile">
+            <input type="hidden" asp-for="AccId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Team" class="control-label"></label>
+                <input asp-for="Team" class="form-control" />
+                <span asp-validation-for="Team" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MineLocation" class="control-label"></label>
+                <input asp-for="MineLocation" class="form-control" />
+                <span asp-validation-for="MineLocation" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Shift" class="control-label"></label>
+                <input asp-for="Shift" class="form-control" />
+                <span asp-validation-for="Shift" class="text-danger"></span>
+            </div>
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="CanViewReports" /> @Html.DisplayNameFor(model => model.CanViewReports)
+                </label>
+            </div>
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="CanManageTasks" /> @Html.DisplayNameFor(model => model.CanManageTasks)
+                </label>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Save Changes" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

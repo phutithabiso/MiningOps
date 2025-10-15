@@ -27,5 +27,12 @@ namespace MiningOps.Entity
         public DateTime? EndDate { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [DataType(DataType.Currency)]
+        [Range(0, double.MaxValue)]
+        public decimal? ContractValue { get; set; }
+
+        [Required]
+        public string ContractType { get; set; } = "unknown";
     }
 }

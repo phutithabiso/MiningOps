@@ -51,7 +51,7 @@ namespace MiningOps.Entity
           .WithMany(mr => mr.PurchaseOrders)
           .HasForeignKey(po => po.MaterialRequestId)
           .OnDelete(DeleteBehavior.Cascade);
-
+         
             modelBuilder.Entity<PurchaseOrder>()
                 .Property(po => po.TotalAmount)
                   .HasPrecision(18, 2);
@@ -75,10 +75,17 @@ namespace MiningOps.Entity
             modelBuilder.Entity<OrderItem>()
                 .Property(o => o.UnitPrice)
                 .HasColumnType("decimal(18,2)");
+           
 
+            modelBuilder.Entity<SupplierContract>()
+                .Property(c => c.ContractValue)
+                .HasColumnType("decimal(18,2)");
 
             base.OnModelCreating(modelBuilder);
         }
+      //  public DbSet<MiningOps.Models.SupplierDashboardViewModel> SupplierDashboardViewModel { get; set; } = default!;
+
+      
    
     }
 }

@@ -297,7 +297,7 @@ namespace MiningOps.Controllers
             return View(model);
         }
 
-        // GET: Edit Admin Profile
+        // GET: Account/EditAdminProfile/5
         public IActionResult EditAdminProfile(int id)
         {
             var profile = _context.AdminProfiles.FirstOrDefault(a => a.AccId == id);
@@ -305,16 +305,16 @@ namespace MiningOps.Controllers
 
             var model = new AdminViewModel
             {
-                AccId = profile.AccId,
+                AccId = id,
                 Department = profile.Department,
                 CanManageUsers = profile.CanManageUsers,
                 CanApproveRequests = profile.CanApproveRequests
             };
 
-            return View(model);
+            return View(model); // Create EditAdminProfile.cshtml
         }
 
-        // POST: Edit Admin Profile
+        // POST: Account/EditAdminProfile/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult EditAdminProfile(int id, AdminViewModel model)
@@ -329,10 +329,88 @@ namespace MiningOps.Controllers
             profile.CanApproveRequests = model.CanApproveRequests;
 
             _context.SaveChanges();
+            TempData["SuccessMessage"] = "Admin profile updated!";
 
-            TempData["SuccessMessage"] = "Admin profile updated successfully!";
             return RedirectToAction("Index", "UserManagement");
         }
+
+
+        // Supervisor profile edit
+        public IActionResult EditSupervisorProfile(int id)
+        {
+            var profile = _context.SupervisorProfiles.FirstOrDefault(s => s.AccId == id);
+            if (profile == null) return NotFound();
+
+            var model = new SupervisorViewModel
+            {
+                AccId = id,
+                Team = profile.Team,
+                MineLocation = profile.MineLocation,
+                Shift = profile.Shift,
+                CanViewReports = profile.CanViewReports,
+                CanManageTasks = profile.CanManageTasks
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditSupervisorProfile(SupervisorViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var profile = _context.SupervisorProfiles.FirstOrDefault(s => s.AccId == model.AccId);
+            if (profile == null) return NotFound();
+
+            profile.Team = model.Team;
+            profile.MineLocation = model.MineLocation;
+            profile.Shift = model.Shift;
+            profile.CanViewReports = model.CanViewReports;
+            profile.CanManageTasks = model.CanManageTasks;
+
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Supervisor profile updated!";
+            return RedirectToAction("Index", "UserManagement");
+        }
+
+        // Supplier profile edit
+        public IActionResult EditSupplierProfile(int id)
+        {
+            var profile = _context.SupplierProfiles.FirstOrDefault(s => s.AccId == id);
+            if (profile == null) return NotFound();
+
+            var model = new SupplierViewModel
+            {
+                AccId = id,
+                CompanyName = profile.CompanyName,
+                ContactPerson = profile.ContactPerson,
+                Address = profile.Address,
+                CanViewOrders = profile.CanViewOrders,
+                CanManageInventory = profile.CanManageInventory
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditSupplierProfile(int id, SupplierViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var profile = _context.SupplierProfiles.FirstOrDefault(s => s.AccId == id);
+            if (profile == null) return NotFound();
+
+            profile.CompanyName = model.CompanyName;
+            profile.ContactPerson = model.ContactPerson;
+            profile.Address = model.Address;
+            profile.CanViewOrders = model.CanViewOrders;
+            profile.CanManageInventory = model.CanManageInventory;
+
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Supplier profile updated!";
+            return RedirectToAction("Index", "UserManagement");
+        }
+
 
     }
 }
