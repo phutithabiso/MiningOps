@@ -83,6 +83,7 @@ namespace MiningOps.Entity
 
             base.OnModelCreating(modelBuilder);
         }
+        public DbSet<MiningOps.Models.LoginViewModel> LoginViewModel { get; set; } = default!;
       //  public DbSet<MiningOps.Models.SupplierDashboardViewModel> SupplierDashboardViewModel { get; set; } = default!;
 
       

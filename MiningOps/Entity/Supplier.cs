@@ -14,16 +14,16 @@ namespace MiningOps.Entity
         public int AccId { get; set; }
 
         [ForeignKey(nameof(AccId))]
-        public RegisterMining RegisterMining { get; set; }
+        public RegisterMining? RegisterMining { get; set; }
 
         [Required(ErrorMessage ="Company name is required"), MaxLength(200)]
-        public string CompanyName { get; set; }    // e.g., Mining Supplies Inc.
+        public string? CompanyName { get; set; }    // e.g., Mining Supplies Inc.
 
         [Required(ErrorMessage ="Contact person is required "), MaxLength(100)]
-        public string ContactPerson { get; set; }  // e.g., Yolanda Doe
+        public string? ContactPerson { get; set; }  // e.g., Yolanda Doe
 
         [MaxLength(300)]
-        public string Address { get; set; }        // e.g., 123 Mining St, City, Country
+        public string? Address { get; set; }        // e.g., 123 Mining St, City, Country
 
         // Permissions
         public bool CanViewOrders { get; set; } = true;

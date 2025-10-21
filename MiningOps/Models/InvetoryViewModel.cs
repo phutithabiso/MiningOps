@@ -1,6 +1,7 @@
 ﻿using MiningOps.Entity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MiningOps.Models
 {
@@ -11,7 +12,7 @@ namespace MiningOps.Models
 
         [Required(ErrorMessage = "Item name is required")]
         [MaxLength(150)]
-        public string ItemName { get; set; }
+        public string? ItemName { get; set; }
 
         [MaxLength(500)]
         public string? Description { get; set; }
@@ -32,11 +33,12 @@ namespace MiningOps.Models
         public int WarehouseId { get; set; }
 
         [ForeignKey(nameof(WarehouseId))]
-        public Warehouse Warehouse { get; set; }
+        public IEnumerable<SelectListItem>? Warehouses { get; set; }
 
         public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
 
         [MaxLength(50)]
         public string? Unit { get; set; } // e.g., "Kg", "Ton", "Litre"
+
     }
 }

@@ -18,7 +18,7 @@ namespace MiningOps.Entity
         [Required]
         public int RequestedBy { get; set; } // RegisterMining.AccId
         [ForeignKey(nameof(RequestedBy))]
-        public RegisterMining Requester { get; set; }
+        public RegisterMining? Requester { get; set; }
 
         public string? Currency { get; set; } = "ZAR";
 

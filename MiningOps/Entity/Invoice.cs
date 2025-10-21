@@ -12,7 +12,7 @@ namespace MiningOps.Entity
         [Required]
         public int OrderId { get; set; }
         [ForeignKey(nameof(OrderId))]
-        public PurchaseOrder Order { get; set; }
+        public PurchaseOrder? Order { get; set; }
 
         public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
         public DateTime? DueDate { get; set; }

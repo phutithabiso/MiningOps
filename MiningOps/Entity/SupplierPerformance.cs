@@ -14,7 +14,7 @@ namespace MiningOps.Entity
         public int SupplierId { get; set; }
 
         [ForeignKey(nameof(SupplierId))]
-        public Supplier Supplier { get; set; }
+        public Supplier? Supplier { get; set; }
 
         public decimal OnTimeDeliveryRate { get; set; } = 0m; // 0..100
         public int QualityRating { get; set; } = 0; // 0..5

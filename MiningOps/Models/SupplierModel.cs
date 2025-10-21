@@ -8,16 +8,16 @@ namespace MiningOps.Models
         // Supplier basic info
         [Required(ErrorMessage = "Supplier name is required")]
         [StringLength(255, MinimumLength = 2, ErrorMessage = "Supplier name must be between 2 and 255 characters")]
-        public string SupplierName { get; set; }
+        public string? SupplierName { get; set; }
 
         // Contract details
         [MaxLength(1000, ErrorMessage = "Contract terms cannot exceed 1000 characters")]
         [Required(ErrorMessage = "Contract terms are required")]
-        public string ContractTerms { get; set; }
+        public string? ContractTerms { get; set; }
 
         [MaxLength(255, ErrorMessage = "Payment terms cannot exceed 255 characters")]
         [Required(ErrorMessage = "Payment terms are required")]
-        public string PaymentTerms { get; set; }
+        public string? PaymentTerms { get; set; }
 
         [DataType(DataType.Date)]
         [Required(ErrorMessage = "Contract start date is required")]

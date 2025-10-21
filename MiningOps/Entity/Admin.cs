@@ -15,7 +15,7 @@ namespace MiningOps.Entity
         public int AccId { get; set; }
 
         [ForeignKey(nameof(AccId))]
-        public RegisterMining RegisterMining { get; set; }
+        public RegisterMining? RegisterMining { get; set; }
         public string Department { get; set; }       // e.g., Procurement, IT
         public bool CanManageUsers { get; set; } = true;
         public bool CanApproveRequests { get; set; } = true;

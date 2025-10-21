@@ -9,7 +9,7 @@ namespace MiningOps.Entity
         public int InventoryId { get; set; }
 
         [Required(ErrorMessage ="Item Name is Required"), MaxLength(150)]
-        public string ItemName { get; set; }
+        public string? ItemName { get; set; }
 
         public string? Description { get; set; }
 

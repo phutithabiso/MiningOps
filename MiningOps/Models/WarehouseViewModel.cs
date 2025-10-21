@@ -9,7 +9,7 @@ namespace MiningOps.Models
  
 
         [Required(ErrorMessage = "Warehouse name is required"), MaxLength(150)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [MaxLength(300)]
         public string? Location { get; set; }

@@ -10,7 +10,7 @@ namespace MiningOps.Entity
 
         [Required(ErrorMessage ="Item Name is required")]
         [MaxLength(200)]
-        public string ItemName { get; set; } = string.Empty;
+        public string? ItemName { get; set; } = string.Empty;
 
         [Required(ErrorMessage =" Quantity is required")]
         public int Quantity { get; set; }

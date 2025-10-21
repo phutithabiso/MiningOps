@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - MiningOps Dashboard</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site1.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     @RenderSection("Styles", required: false)
     <style>
        
@@ -17,10 +17,10 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <span class="app-name">MiningOps</span>
+                <span class="app-name">MiningOps</span>Ld
             </div>
 
-            @if (Context.User.Identity.IsAuthenticated)
+            @if (Context.User.Identity!.IsAuthenticated)
             {
                 <div class="sidebar-subheader">
                     @if (Context.User.IsInRole("Admin"))
@@ -57,7 +57,7 @@
                 </div>
                 <ul class="sidebar-menu">
                     <li class="menu-item active">
-                        <a asp-controller="Account" asp-action="Register">
+                        <a asp-controller="Account" asp-action="Login">
                             <i class="fa fa-sign-in-alt"></i>
                             <span>Login</span>
                         </a>

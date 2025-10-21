@@ -48,7 +48,7 @@ namespace MiningOps.Migrations
                     b.HasIndex("AccId")
                         .IsUnique();
 
-                    b.ToTable("AdminProfiles", (string)null);
+                    b.ToTable("AdminProfiles");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.InventoryItem", b =>
@@ -90,7 +90,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("InventoryDb", (string)null);
+                    b.ToTable("InventoryDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Invoice", b =>
@@ -126,7 +126,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("InvoicesDb", (string)null);
+                    b.ToTable("InvoicesDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.MaterialRequest", b =>
@@ -155,7 +155,7 @@ namespace MiningOps.Migrations
 
                     b.HasKey("MaterialRequestId");
 
-                    b.ToTable("MaterialRequestsDb", (string)null);
+                    b.ToTable("MaterialRequestsDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.OrderItem", b =>
@@ -184,7 +184,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("OrderItemsDb", (string)null);
+                    b.ToTable("OrderItemsDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Payment", b =>
@@ -216,7 +216,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("InvoiceId");
 
-                    b.ToTable("PaymentsDb", (string)null);
+                    b.ToTable("PaymentsDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.PurchaseOrder", b =>
@@ -260,7 +260,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("PurchaseOrdersDb", (string)null);
+                    b.ToTable("PurchaseOrdersDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.RegisterMining", b =>
@@ -312,7 +312,7 @@ namespace MiningOps.Migrations
 
                     b.HasKey("AccId");
 
-                    b.ToTable("RegisterMiningDb", (string)null);
+                    b.ToTable("RegisterMiningDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Supervisor", b =>
@@ -349,7 +349,7 @@ namespace MiningOps.Migrations
                     b.HasIndex("AccId")
                         .IsUnique();
 
-                    b.ToTable("SupervisorProfiles", (string)null);
+                    b.ToTable("SupervisorProfiles");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Supplier", b =>
@@ -389,7 +389,7 @@ namespace MiningOps.Migrations
                     b.HasIndex("AccId")
                         .IsUnique();
 
-                    b.ToTable("SupplierProfiles", (string)null);
+                    b.ToTable("SupplierProfiles");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.SupplierContract", b =>
@@ -403,6 +403,14 @@ namespace MiningOps.Migrations
                     b.Property<string>("ContractTerms")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ContractType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal?>("ContractValue")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -424,7 +432,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("SupplierContractDb", (string)null);
+                    b.ToTable("SupplierContractDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.SupplierPerformance", b =>
@@ -456,7 +464,7 @@ namespace MiningOps.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("SupplierPerformanceDb", (string)null);
+                    b.ToTable("SupplierPerformanceDb");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Warehouse", b =>
@@ -484,7 +492,21 @@ namespace MiningOps.Migrations
 
                     b.HasKey("WarehouseId");
 
-                    b.ToTable("WarehousesDb", (string)null);
+                    b.ToTable("WarehousesDb");
+                });
+
+            modelBuilder.Entity("MiningOps.Models.LoginViewModel", b =>
+                {
+                    b.Property<string>("usernameoremail")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("usernameoremail");
+
+                    b.ToTable("LoginViewModel");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Admin", b =>

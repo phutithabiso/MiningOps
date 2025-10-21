@@ -14,8 +14,8 @@ namespace MiningOps.Entity
         public int AccId { get; set; }
 
         [ForeignKey(nameof(AccId))]
-        public RegisterMining RegisterMining { get; set; }
-        public string Team { get; set; }              // e.g., Maintenance, Operations
+        public RegisterMining? RegisterMining { get; set; }
+        public string? Team { get; set; }              // e.g., Maintenance, Operations
         [MaxLength(200)]
         public string? MineLocation { get; set; }
 

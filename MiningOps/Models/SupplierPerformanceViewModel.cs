@@ -27,6 +27,6 @@ namespace MiningOps.Models
         [DataType(DataType.Date)]
         [Display(Name = "Report Date")]
         public DateTime ReportDate { get; set; } = DateTime.UtcNow;
-        public IEnumerable<SelectListItem> Suppliers { get; set; }
+        public IEnumerable<SelectListItem>? Suppliers { get; set; }
     }
 }

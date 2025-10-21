@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using MiningOps.Entity;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-namespace MiningOps.Entity
-{
-    public class MaterialRequest
-    {
 
+namespace MiningOps.Models
+{
+    public class MaterialRequestViewModel
+    {
         [Key]
         public int MaterialRequestId { get; set; }
 
         [Required(ErrorMessage = "Item Name is required")]
         [MaxLength(200)]
-        public string? ItemName { get; set; } = string.Empty;
+        public string ItemName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Quantity is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than 0")]

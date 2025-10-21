@@ -12,7 +12,7 @@ namespace MiningOps.Entity
         public int SupplierId { get; set; }
 
         [ForeignKey(nameof(SupplierId))]
-        public Supplier Supplier { get; set; }
+        public Supplier? Supplier { get; set; }
 
         [MaxLength(1000)]
         public string? ContractTerms { get; set; }   // Terms of the contract
@@ -32,7 +32,8 @@ namespace MiningOps.Entity
         [Range(0, double.MaxValue)]
         public decimal? ContractValue { get; set; }
 
-        [Required]
+        [StringLength(50)]
         public string ContractType { get; set; } = "unknown";
+
     }
 }

@@ -12,8 +12,8 @@ namespace MiningOps.Models
         [Key]
         // Supplier info
         public int SupId { get; set; }
-        public string SupplierName { get; set; }
-        public string ContactPerson { get; set; }
+        public string? SupplierName { get; set; }
+        public string? ContactPerson { get; set; }
 
         // Contracts & performance
         public IEnumerable<SupplierContract> SupplierContracts { get; set; } = new List<SupplierContract>();

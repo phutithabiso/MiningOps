@@ -30,7 +30,8 @@ namespace MiningOps.Models
         
         [Range(0, double.MaxValue)]
         public decimal ContractValue { get; set; }  // Use decimal for monetary precision
-        [Required]
+        [StringLength(50)]
         public string ContractType { get; set; } = "unknown";
+
     }
 }

@@ -12,8 +12,8 @@ using MiningOps.Entity;
 namespace MiningOps.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251011211547_miningProcess")]
-    partial class miningProcess
+    [Migration("20251015195911_fixMaterialRequest")]
+    partial class fixMaterialRequest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -407,6 +407,14 @@ namespace MiningOps.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<string>("ContractType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal?>("ContractValue")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -488,6 +496,20 @@ namespace MiningOps.Migrations
                     b.HasKey("WarehouseId");
 
                     b.ToTable("WarehousesDb");
+                });
+
+            modelBuilder.Entity("MiningOps.Models.LoginViewModel", b =>
+                {
+                    b.Property<string>("usernameoremail")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("usernameoremail");
+
+                    b.ToTable("LoginViewModel");
                 });
 
             modelBuilder.Entity("MiningOps.Entity.Admin", b =>

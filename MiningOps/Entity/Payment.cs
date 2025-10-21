@@ -12,7 +12,7 @@ namespace MiningOps.Entity
         public int InvoiceId { get; set; }
         [ForeignKey(nameof(InvoiceId))]
 
-        public Invoice Invoice { get; set; }
+        public Invoice? Invoice { get; set; }
 
         public DateTime PaidDate { get; set; } = DateTime.UtcNow;
         [Column(TypeName = "decimal(18,2)")]
