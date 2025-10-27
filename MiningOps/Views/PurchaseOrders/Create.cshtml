@@ -1,0 +1,111 @@
+﻿@model MiningOps.Models.PurchaseOrderViewModel
+
+@{
+    ViewData["Title"] = "Create Purchase Order";
+}
+
+<div class="page-header">
+    <h1><i class="fas fa-file-invoice-dollar"></i> Create Purchase Order</h1>
+    <p class="lead">Create a new purchase order for supplier materials</p>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Purchase Order Details</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post" class="styled-form">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="form-group mb-4">
+                <label asp-for="SupplierId" class="form-label">
+                    <i class="fas fa-truck"></i> Supplier
+                </label>
+                <select asp-for="SupplierId" class="form-control styled-select" asp-items="@(ViewBag.Supplier as List<SelectListItem>)">
+                    <option value="">-- Select Supplier --</option>
+                </select>
+                <span asp-validation-for="SupplierId" class="text-danger validation-message"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label asp-for="RequestedBy" class="form-label">
+                    <i class="fas fa-user"></i> Requested By
+                </label>
+                <select asp-for="RequestedBy" class="form-control styled-select" asp-items="@(ViewBag.RequestedBy as List<SelectListItem>)">
+                    <option value="">-- Select Requester --</option>
+                </select>
+                <span asp-validation-for="RequestedBy" class="text-danger validation-message"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label asp-for="MaterialRequestId" class="form-label">
+                    <i class="fas fa-list-alt"></i> Material Request
+                </label>
+                <select asp-for="MaterialRequestId" class="form-control styled-select" asp-items="@(ViewBag.MaterialRequestId as List<SelectListItem>)">
+                    <option value="">-- Select Material Request --</option>
+                </select>
+                <span asp-validation-for="MaterialRequestId" class="text-danger validation-message"></span>
+            </div>
+
+            
+                <div class="form-group mb-4">
+                    <label asp-for="Currency" class="form-label">
+                        <i class="fas fa-money-bill-wave"></i> Currency
+                    </label>
+                    <select asp-for="Currency" class="form-select form-select-lg">
+                        <option value="">-- Select Currency --</option>
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British Pound</option>
+                        <option value="CAD">CAD - Canadian Dollar</option>
+                        <option value="AUD">AUD - Australian Dollar</option>
+                        <option value="ZAR">ZAR - South African Rand</option>
+                    </select>
+                    <span asp-validation-for="Currency" class="text-danger validation-message"></span>
+                </div>
+            <div class="form-group mb-4">
+                <label asp-for="ExpectedDeliveryDate" class="form-label">
+                    <i class="fas fa-calendar-check"></i> Expected Delivery Date
+                </label>
+                <input asp-for="ExpectedDeliveryDate" class="form-control styled-input" type="date" />
+                <span asp-validation-for="ExpectedDeliveryDate" class="text-danger validation-message"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label asp-for="TotalAmount" class="form-label">
+                    <i class="fas fa-calculator"></i> Total Amount
+                </label>
+                <input asp-for="TotalAmount" class="form-control styled-input" type="number" step="0.01" />
+                <span asp-validation-for="TotalAmount" class="text-danger validation-message"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label asp-for="Status" class="form-label">
+                    <i class="fas fa-tasks"></i> Status
+                </label>
+                <select asp-for="Status" class="form-control styled-select" asp-items="Html.GetEnumSelectList<MiningOps.Entity.roleFolder.OrderStatus>()"></select>
+                <span asp-validation-for="Status" class="text-danger validation-message"></span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Create
+                </button>
+                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="~/css/site1.css" asp-append-version="true" />

@@ -13,7 +13,7 @@ namespace MiningOps.Entity
         public int SupplierId { get; set; }
 
         [ForeignKey(nameof(SupplierId))]
-        public Supplier Supplier { get; set; }
+        public Supplier? Supplier { get; set; }
 
         [Required]
         public int RequestedBy { get; set; } // RegisterMining.AccId
@@ -22,10 +22,10 @@ namespace MiningOps.Entity
 
         public string? Currency { get; set; } = "ZAR";
 
-        public OrderStatus Status { get; set; } = OrderStatus.Pending;
+        public OrderStatus Status { get; set; } = OrderStatus.Pending; 
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? ExpectedDeliveryDate { get; set; }
+        public DateTime? ExpectedDeliveryDate { get; set; } 
 
         public decimal TotalAmount { get; set; } = 0m;
 
@@ -35,7 +35,10 @@ namespace MiningOps.Entity
         [ForeignKey(nameof(MaterialRequestId))]
         public MaterialRequest? MaterialRequest { get; set; }
 
+
+
         // Navigation
+        public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
         public ICollection<OrderItem>? Items { get; set; }
         public ICollection<Invoice>? Invoices { get; set; }
     }

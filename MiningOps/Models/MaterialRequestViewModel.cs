@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using MiningOps.Entity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MiningOps.Models
 {
@@ -24,7 +25,9 @@ namespace MiningOps.Models
         [Required]
         [DataType(DataType.Date)]
         public DateTime RequestDate { get; set; } = DateTime.Now;
-        public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
+
+        
+
 
     }
 }

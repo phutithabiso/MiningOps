@@ -81,9 +81,21 @@ namespace MiningOps.Entity
                 .Property(c => c.ContractValue)
                 .HasColumnType("decimal(18,2)");
 
+            modelBuilder.Entity<OrderItem>()
+               .HasOne(o => o.PurchaseOrder)
+               .WithMany(p => p.Items)
+               .HasForeignKey(o => o.PurchaseOrderId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+    
+
             base.OnModelCreating(modelBuilder);
         }
-        public DbSet<MiningOps.Models.LoginViewModel> LoginViewModel { get; set; } = default!;
+      //  public DbSet<MiningOps.Models.PaymentViewModel> PaymentViewModel { get; set; } = default!;
+
+       // public DbSet<MiningOps.Models.LoginViewModel> LoginViewModel { get; set; } = default!;
+       // public DbSet<MiningOps.Models.PurchaseOrderViewModel> PurchaseOrderViewModel { get; set; } = default!;
+       // public DbSet<MiningOps.Models.OrderItemsViewModel> OrderItemsViewModel { get; set; } = default!;
       //  public DbSet<MiningOps.Models.SupplierDashboardViewModel> SupplierDashboardViewModel { get; set; } = default!;
 
       
