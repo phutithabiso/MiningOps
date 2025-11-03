@@ -19,8 +19,9 @@ namespace MiningOps.Entity
         public DbSet<OrderItem> OrderItemsDb { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrdersDb { get; set; }
         public DbSet<MaterialRequest> MaterialRequestsDb { get; set; }
-        public DbSet<Invoice> InvoicesDb { get; set; }
         public DbSet<Payment> PaymentsDb { get; set; }
+        public  DbSet<Invoice> InvoicesDb { get; set; }
+       
 
 
 
@@ -28,14 +29,14 @@ namespace MiningOps.Entity
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        { 
             modelBuilder.Entity<RegisterMining>()
     .Property(u => u.PasswordHash)
     .HasMaxLength(500); // adjust if needed
 
             modelBuilder.Entity<RegisterMining>()
                 .Property(u => u.Salt)
-                .HasMaxLength(500); // usually much shorter, but safe
+                .HasMaxLength(500);
             modelBuilder.Entity<InventoryItem>()
        .Property(i => i.UnitCost)
        .HasColumnType("decimal(18,2)");
@@ -44,7 +45,7 @@ namespace MiningOps.Entity
        .HasOne(p => p.Supplier)
        .WithMany(s => s.PurchaseOrders)
        .HasForeignKey(p => p.SupplierId)
-       .OnDelete(DeleteBehavior.Restrict); // ✅ Prevents multiple cascade path error
+       .OnDelete(DeleteBehavior.Restrict); 
 
             modelBuilder.Entity<PurchaseOrder>()
           .HasOne(po => po.MaterialRequest)
@@ -87,16 +88,16 @@ namespace MiningOps.Entity
                .HasForeignKey(o => o.PurchaseOrderId)
                .OnDelete(DeleteBehavior.Cascade);
 
-    
+            //modelBuilder.Entity<MaterialRequest>()
+            //    .HasOne(m => m.Supplier)
+            //    .WithMany(s => s.MaterialRequests)
+            //    .HasForeignKey(m => m.SupplierId)
+            //    .OnDelete(DeleteBehavior.Restrict);
+
 
             base.OnModelCreating(modelBuilder);
         }
-      //  public DbSet<MiningOps.Models.PaymentViewModel> PaymentViewModel { get; set; } = default!;
-
-       // public DbSet<MiningOps.Models.LoginViewModel> LoginViewModel { get; set; } = default!;
-       // public DbSet<MiningOps.Models.PurchaseOrderViewModel> PurchaseOrderViewModel { get; set; } = default!;
-       // public DbSet<MiningOps.Models.OrderItemsViewModel> OrderItemsViewModel { get; set; } = default!;
-      //  public DbSet<MiningOps.Models.SupplierDashboardViewModel> SupplierDashboardViewModel { get; set; } = default!;
+      
 
       
    

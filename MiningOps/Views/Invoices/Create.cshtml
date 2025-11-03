@@ -1,0 +1,128 @@
+﻿@model MiningOps.Models.InvoiceViewModel
+
+@{
+    ViewData["Title"] = "Create Invoice";
+    // Preload order totals for JS
+    var orderTotals = new Dictionary<int, decimal>();
+    foreach (var item in ViewBag.OrderId as List<SelectListItem>)
+    {
+        var orderId = int.Parse(item.Value);
+        var total = ((List<MiningOps.Entity.OrderItem>)ViewBag.OrderItemsDict?[orderId])?.Sum(oi => oi.Quantity * oi.UnitPrice) ?? 0;
+        orderTotals[orderId] = total;
+    }
+}
+
+<div class="page-header">
+    <h1><i class="fas fa-file-invoice"></i> Create Invoice</h1>
+    <p class="lead">Generate a new invoice for purchase order</p>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-receipt"></i> Invoice Details</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" class="styled-form">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Purchase Order Dropdown -->
+                    <div class="form-group mb-4">
+                        <label asp-for="OrderId" class="form-label">
+                            <i class="fas fa-shopping-cart"></i> Purchase Order
+                        </label>
+                        <select asp-for="OrderId" class="form-control styled-select" asp-items="ViewBag.OrderId" id="OrderId">
+                            <option value="">-- Select Purchase Order --</option>
+                        </select>
+                        <span asp-validation-for="OrderId" class="text-danger validation-message"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="InvoiceDate" class="form-label">
+                            <i class="fas fa-calendar-plus"></i> Invoice Date
+                        </label>
+                        <input asp-for="InvoiceDate" type="date" class="form-control styled-input" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="InvoiceDate" class="text-danger validation-message"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="DueDate" class="form-label">
+                            <i class="fas fa-calendar-minus"></i> Due Date
+                        </label>
+                        <input asp-for="DueDate" type="date" class="form-control styled-input" />
+                        <span asp-validation-for="DueDate" class="text-danger validation-message"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="Amount" class="form-label">
+                            <i class="fas fa-dollar-sign"></i> Amount
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Amount" type="number" step="0.01" class="form-control styled-input" placeholder="0.00" readonly id="Amount" />
+                        </div>
+                        <span asp-validation-for="Amount" class="text-danger validation-message"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label asp-for="Status" class="form-label">
+                            <i class="fas fa-tasks"></i> Status
+                        </label>
+                        <select asp-for="Status" class="form-control styled-select" asp-items="ViewBag.StatusList">
+                            <option value="">-- Select Status --</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger validation-message"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="InvoiceReference" class="form-label">
+                            <i class="fas fa-hashtag"></i> Invoice Reference
+                        </label>
+                        <input asp-for="InvoiceReference" class="form-control styled-input" readonly id="InvoiceReference" />
+                        <span asp-validation-for="InvoiceReference" class="text-danger validation-message"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-file-invoice-dollar"></i> Create Invoice
+                </button>
+                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const orderSelect = document.getElementById('OrderId');
+            const amountInput = document.getElementById('Amount');
+            const invoiceRefInput = document.getElementById('InvoiceReference');
+
+            // Server-side order totals
+            const orderTotals = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(orderTotals));
+
+            orderSelect.addEventListener('change', function () {
+                const orderId = parseInt(this.value);
+                if (!orderId) {
+                    amountInput.value = 0;
+                    invoiceRefInput.value = '';
+                    return;
+                }
+
+                const total = orderTotals[orderId] || 0;
+                amountInput.value = total.toFixed(2);
+                invoiceRefInput.value = `INV-${orderId}-${new Date().toISOString().replace(/[-T:.Z]/g,'')}`;
+            });
+        });
+    </script>
+}

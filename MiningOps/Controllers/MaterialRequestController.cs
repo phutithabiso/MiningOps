@@ -16,12 +16,45 @@ namespace MiningOps.Controllers
             _context = context;
         }
 
+        //public async Task<IActionResult> Index()
+        //{
+        //    var requests = await _context.MaterialRequestsDb
+        //       .OrderByDescending(r => r.RequestDate)
+        //        .ToListAsync();
+        //    return View(requests);
+        //}
         public async Task<IActionResult> Index()
         {
             var requests = await _context.MaterialRequestsDb
-                .OrderByDescending(r => r.RequestDate)
-                .ToListAsync();
+ .OrderByDescending(r => r.RequestDate)
+               .ToListAsync();
+
+      
             return View(requests);
+        }
+
+        // GET: MaterialRequest/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var request = await _context.MaterialRequestsDb
+                .FirstOrDefaultAsync(r => r.MaterialRequestId == id);
+
+            if (request == null)
+                return NotFound();
+
+            var model = new MaterialRequestViewModel
+            {
+                MaterialRequestId = request.MaterialRequestId,
+                ItemName = request.ItemName,
+                Quantity = request.Quantity,
+                Status = request.Status,
+                RequestDate = request.RequestDate
+            };
+
+            return View(model);
         }
 
         public IActionResult Create()
@@ -120,4 +153,4 @@ namespace MiningOps.Controllers
             return RedirectToAction(nameof(Index));
         }
     }
-}
+} 

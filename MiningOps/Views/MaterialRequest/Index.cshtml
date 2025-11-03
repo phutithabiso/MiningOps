@@ -1,53 +1,235 @@
 ﻿@model IEnumerable<MiningOps.Entity.MaterialRequest>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Material Requests";
 }
 
-<h1>Index</h1>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site1.css" asp-append-version="true" />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ItemName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RequestDate)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ItemName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RequestDate)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.MaterialRequestId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.MaterialRequestId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.MaterialRequestId">Delete</a>
-            </td>
-        </tr>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold"><i class="fas fa-clipboard-list me-2 text-primary"></i> Material Requests</h4>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Create New Request
+    </a>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4 g-3">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary shadow-sm">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="card-title">Total Requests</h6>
+                    <h4>@Model.Count()</h4>
+                </div>
+                <i class="fas fa-clipboard-list fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success shadow-sm">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="card-title">Approved</h6>
+                    <h4>@Model.Count(m => m.Status == "Approved")</h4>
+                </div>
+                <i class="fas fa-check-circle fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning shadow-sm">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="card-title">Pending</h6>
+                    <h4>@Model.Count(m => m.Status == "Pending")</h4>
+                </div>
+                <i class="fas fa-clock fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger shadow-sm">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="card-title">Rejected</h6>
+                    <h4>@Model.Count(m => m.Status == "Rejected")</h4>
+                </div>
+                <i class="fas fa-times-circle fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light fw-semibold">Filters & Search</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label" for="statusFilter">Filter by Status</label>
+                <select id="statusFilter" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="searchInput">Search Items</label>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by item name...">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="dateFilter">Filter by Date</label>
+                <input type="date" id="dateFilter" class="form-control" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h6 class="fw-semibold mb-0">Material Requests List</h6>
+        <button id="exportBtn" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-download me-1"></i> Export CSV
+        </button>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table id="materialRequestsTable" class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark text-uppercase">
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Request Date</th>
+                        <th>Priority</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var priorityClass = item.Quantity > 100 ? "badge-danger" :
+                        item.Quantity > 50 ? "badge-warning" : "badge-info";
+                        var priorityText = item.Quantity > 100 ? "High" :
+                        item.Quantity > 50 ? "Medium" : "Low";
+
+                        var statusClass = item.Status?.ToLower() switch
+                        {
+                            "approved" => "badge bg-success",
+                            "pending" => "badge bg-warning text-dark",
+                            "rejected" => "badge bg-danger",
+                            "in progress" => "badge bg-info text-dark",
+                            "completed" => "badge bg-primary",
+                            _ => "badge bg-secondary"
+                        };
+
+                        <tr class="request-row" data-status="@item.Status?.ToLower()" data-item="@item.ItemName?.ToLower()" data-date="@item.RequestDate.ToString("yyyy-MM-dd")">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-box text-primary me-2"></i>
+                                    <strong>@item.ItemName</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@item.Quantity</span>
+                            </td>
+                            <td>
+                                <span class="@statusClass">@item.Status</span>
+                            </td>
+                            <td>
+                                <small class="text-muted d-block">@item.RequestDate.ToString("MMM dd, yyyy")</small>
+                                <small class="text-muted">@item.RequestDate.ToString("hh:mm tt")</small>
+                            </td>
+                            <td><span class="badge  text-primary @priorityClass">@priorityText</span></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@item.MaterialRequestId" class="btn btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                    <a asp-action="Details" asp-route-id="@item.MaterialRequestId" class="btn btn-outline-info"><i class="fas fa-eye"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@item.MaterialRequestId" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">No Material Requests Found</h4>
+        <p class="text-muted">Get started by creating your first material request.</p>
+        <a asp-action="Create" class="btn btn-primary mt-3">
+            <i class="fas fa-plus-circle"></i> Create First Request
+        </a>
+    </div>
 }
-    </tbody>
-</table>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a2d9b1a6b4.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusFilter = document.getElementById('statusFilter');
+            const searchInput = document.getElementById('searchInput');
+            const dateFilter = document.getElementById('dateFilter');
+            const exportBtn = document.getElementById('exportBtn');
+            const rows = document.querySelectorAll('.request-row');
+
+            function filterTable() {
+                const statusValue = statusFilter.value.toLowerCase();
+                const searchValue = searchInput.value.toLowerCase();
+                const dateValue = dateFilter.value;
+
+                rows.forEach(row => {
+                    const rowStatus = row.getAttribute('data-status');
+                    const rowItem = row.getAttribute('data-item');
+                    const rowDate = row.getAttribute('data-date');
+
+                    const statusMatch = !statusValue || rowStatus === statusValue;
+                    const searchMatch = !searchValue || rowItem.includes(searchValue);
+                    const dateMatch = !dateValue || rowDate === dateValue;
+
+                    row.style.display = (statusMatch && searchMatch && dateMatch) ? '' : 'none';
+                });
+            }
+
+            [statusFilter, searchInput, dateFilter].forEach(el => el.addEventListener('input', filterTable));
+
+            exportBtn.addEventListener('click', function () {
+                const headers = ['Item Name', 'Quantity', 'Status', 'Request Date', 'Priority'];
+                const csvContent = [
+                    headers.join(','),
+                    ...Array.from(rows)
+                        .filter(row => row.style.display !== 'none')
+                        .map(row => {
+                            const cells = row.querySelectorAll('td');
+                            return [
+                                `"${cells[0].querySelector('strong').textContent.trim()}"`,
+                                cells[1].textContent.trim(),
+                                cells[2].textContent.trim(),
+                                cells[3].textContent.trim().split('\n')[0],
+                                cells[4].textContent.trim()
+                            ].join(',');
+                        })
+                ].join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'material-requests.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        });
+    </script>
+}

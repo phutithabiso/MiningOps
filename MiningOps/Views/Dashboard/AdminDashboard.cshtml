@@ -1,0 +1,33 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Supplier Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3 text-center">
+            <h4>Total Suppliers</h4>
+            <p class="display-6">@Model.totalSuppliers</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3 text-center">
+            <h4>Total Orders</h4>
+            <p class="display-6">@Model.totalOrders</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3 text-center">
+            <h4>Total Payments (ZAR)</h4>
+            <p class="display-6">@Model.totalPayments.ToString("N2")</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3 text-center">
+            <h4>Overdue Invoices</h4>
+            <p class="display-6 text-danger">@Model.overdueInvoices</p>
+        </div>
+    </div>
+</div>

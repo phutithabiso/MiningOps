@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MiningOps.Entity;
 using MiningOps.Models;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -47,6 +48,11 @@ namespace MiningOps.Controllers
         public IActionResult Create()
         {
             PopulateDropdowns();
+
+            // Prepare invoice totals for JavaScript
+            ViewBag.InvoiceTotals = _context.InvoicesDb
+                .ToDictionary(i => i.InvoiceId, i => i.Amount);
+
             return View();
         }
 
@@ -57,13 +63,30 @@ namespace MiningOps.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Ensure invoice exists
+                var invoice = await _context.InvoicesDb
+                    .FirstOrDefaultAsync(i => i.InvoiceId == model.InvoiceId);
+
+                if (invoice == null)
+                {
+                    ModelState.AddModelError("InvoiceId", "Selected invoice does not exist.");
+                    PopulateDropdowns(model);
+                    return View(model);
+                }
+
+                // Use invoice amount as payment amount if not set
+                decimal amount = model.Amount > 0 ? model.Amount : invoice.Amount;
+
+                // Generate payment reference
+                string paymentRef = $"PAY-{model.InvoiceId}-{DateTime.Now:yyyyMMddHHmmss}";
+
                 var payment = new Payment
                 {
                     InvoiceId = model.InvoiceId,
-                    Amount = model.Amount,
+                    Amount = amount,
                     PaidDate = model.PaidDate,
                     ApprovedById = model.ApprovedById,
-                    PaymentReference = model.PaymentReference
+                    PaymentReference = paymentRef
                 };
 
                 _context.Add(payment);

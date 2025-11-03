@@ -20,7 +20,7 @@ namespace MiningOps.Controllers
         public async Task<IActionResult> Index()
         {
             var items = await _context.OrderItemsDb
-            
+           
                 .ToListAsync();
 
             return View(items);
@@ -142,7 +142,7 @@ namespace MiningOps.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var item = await _context.OrderItemsDb.FindAsync(id);
-            if (item != null)
+            if (item != null)  
             {
                 _context.OrderItemsDb.Remove(item);
                 await _context.SaveChangesAsync();

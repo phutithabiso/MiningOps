@@ -18,9 +18,9 @@ namespace MiningOps.Models
         [Display(Name = "Due Date")]
         public DateTime? DueDate { get; set; }
 
-        [Required(ErrorMessage = "Amount is required")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
-        [Display(Name = "Invoice Amount")]
+   
+       // [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
+        //[Display(Name = "Invoice Amount")]
         public decimal Amount { get; set; } = 0m;
 
         [Display(Name = "Status")]

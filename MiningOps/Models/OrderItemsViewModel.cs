@@ -25,9 +25,9 @@ namespace MiningOps.Models
 
         // Foreign Key to PurchaseOrder
         [Required(ErrorMessage = "Purchase Order is required")]
-        public int PurchaseOrderId { get; set; }
+        public int OrderId { get; set; }
 
-        [ForeignKey(nameof(PurchaseOrderId))]
+        [ForeignKey(nameof(OrderId))]
         public PurchaseOrder? PurchaseOrder { get; set; }
 
     }

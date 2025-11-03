@@ -48,6 +48,15 @@ namespace MiningOps.Controllers
         public IActionResult Create()
         {
             PopulateDropdowns();
+
+            // Prepare dictionary of order totals for JavaScript
+            ViewBag.OrderTotals = _context.PurchaseOrdersDb
+                .Include(po => po.Items)
+                .ToDictionary(
+                    po => po.OrderId,
+                    po => po.Items.Sum(oi => oi.Quantity * oi.UnitPrice)
+                );
+
             return View();
         }
 
@@ -58,19 +67,38 @@ namespace MiningOps.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Ensure order exists
+                var orderItems = await _context.OrderItemsDb
+                    .Where(oi => oi.PurchaseOrderId == model.OrderId)
+                    .ToListAsync();
+
+                if (!orderItems.Any())
+                {
+                    ModelState.AddModelError("OrderId", "Selected order has no items.");
+                    PopulateDropdowns(model);
+                    return View(model);
+                }
+
+                // Calculate total
+                decimal totalAmount = orderItems.Sum(oi => oi.Quantity * oi.UnitPrice);
+
+                // Generate invoice reference
+                string invoiceRef = $"INV-{model.OrderId}-{DateTime.Now:yyyyMMddHHmmss}";
+
                 var invoice = new Invoice
                 {
                     OrderId = model.OrderId,
                     InvoiceDate = model.InvoiceDate,
                     DueDate = model.DueDate,
-                    Amount = model.Amount,
+                    Amount = totalAmount,
                     Status = model.Status,
-                    InvoiceReference = model.InvoiceReference,
+                    InvoiceReference = invoiceRef,
                     InvoiceFilePath = model.InvoiceFilePath
                 };
 
                 _context.Add(invoice);
                 await _context.SaveChangesAsync();
+
                 TempData["Success"] = "Invoice created successfully!";
                 return RedirectToAction(nameof(Index));
             }

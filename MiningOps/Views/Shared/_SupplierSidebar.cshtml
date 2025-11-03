@@ -1,28 +1,32 @@
-﻿@page
-@model MiningOps.Views.Shared._SupplierSidebarModel
-@{
+﻿@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 }
+
 <ul class="sidebar-menu">
-    <li class="menu-item active">
-        <a asp-controller="Supplier" asp-action="Dashboard">
+    <li class="menu-item @(currentController == "SupplierDashboard" && currentAction == "Index" ? "active" : "")">
+        <a asp-controller="SupplierDashboard" asp-action="Index">
             <i class="fa fa-tachometer-alt"></i>
             <span>Dashboard</span>
         </a>
     </li>
-    <li class="menu-item">
-        <a asp-controller="Supplier" asp-action="MyOrders">
+
+    <li class="menu-item @(currentController == "OrderItems" ? "active" : "")">
+        <a asp-controller="OrderItems" asp-action="Index">
             <i class="fa fa-shopping-cart"></i>
             <span>My Orders</span>
         </a>
     </li>
-    <li class="menu-item">
+
+    <li class="menu-item @(currentController == "MaterialRequest" ? "active" : "")">
         <a asp-controller="MaterialRequest" asp-action="Index">
             <i class="fa fa-clipboard-list"></i>
             <span>Supply Requests</span>
         </a>
     </li>
-    <li class="menu-item">
-        <a asp-controller="Payment" asp-action="SupplierPayments">
+
+    <li class="menu-item @(currentController == "Payments" && currentAction == "Create" ? "active" : "")">
+        <a asp-controller="Payments" asp-action="Create">
             <i class="fa fa-credit-card"></i>
             <span>Payments</span>
         </a>

@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1>Admin Dashboard</h1>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h4>Payments Trend (Monthly)</h4>
+        <canvas id="paymentsChart"></canvas>
+    </div>
+    <div class="col-md-6">
+        <h4>Invoice Status Overview</h4>
+        <canvas id="invoicesChart"></canvas>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h4>Material Quantities Requested</h4>
+        <canvas id="materialsChart"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Payments Line Chart
+        const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
+        new Chart(paymentsCtx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PaymentLabels)),
+                datasets: [{
+                    label: 'Total Payments (R)',
+                    data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PaymentValues)),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // Invoice Pie Chart
+        const invoicesCtx = document.getElementById('invoicesChart').getContext('2d');
+        new Chart(invoicesCtx, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.InvoiceLabels)),
+                datasets: [{
+                    data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.InvoiceValues)),
+                    backgroundColor: ['#4caf50', '#f44336', '#ff9800', '#2196f3']
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // Materials Bar Chart
+        const materialsCtx = document.getElementById('materialsChart').getContext('2d');
+        new Chart(materialsCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.MaterialLabels)),
+                datasets: [{
+                    label: 'Quantity Requested',
+                    data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.MaterialValues)),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+}

@@ -55,7 +55,7 @@ namespace MiningOps.Controllers
                             new ClaimsPrincipal(claimsIdentity)
                         );
 
-                        return RedirectToAction("Dashboard", "Account");
+                        return RedirectToAction("Index", "AdminDashboard");
                     }
                 }
 

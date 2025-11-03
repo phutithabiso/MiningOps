@@ -38,7 +38,7 @@ namespace MiningOps.Entity
 
 
         // Navigation
-        public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
+
         public ICollection<OrderItem>? Items { get; set; }
         public ICollection<Invoice>? Invoices { get; set; }
     }

@@ -1,0 +1,289 @@
+﻿@model IEnumerable<MiningOps.Entity.Invoice>
+
+@{
+    ViewData["Title"] = "Invoices";
+}
+
+<div class="page-header">
+    <h1><i class="fas fa-file-invoice"></i> Invoices</h1>
+    <p class="lead">Manage and track all issued invoices</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Invoice List</h5>
+            <div class="btn-group">
+                <a asp-controller="Payments" asp-action="Index" class="btn btn-info btn-lg me-2">
+                    <i class="fas fa-file-invoice"></i> Invoices
+                </a>
+                <a asp-action="Create" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus-circle"></i> Create New
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center mt-3">
+                <i class="fas fa-info-circle"></i> No invoices found.
+            </div>
+        }
+        else
+        {
+            <div class="table-container">
+                <table class="table table-striped table-hover">
+                    <thead class="table-header">
+                        <tr>
+                            <th>Order</th>
+                            <th>Invoice Date</th>
+                            <th>Due Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Reference</th>
+                            <th>File Path</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="table-row">
+                                <td>
+                                    <span class="invoice-badge">
+                                        @(item.Order != null ? $"ORD#{item.Order.OrderId}" : "N/A")
+                                    </span>
+                                </td>
+                                <td>@item.InvoiceDate.ToString("MMM dd, yyyy")</td>
+                                <td>@(item.DueDate?.ToString("MMM dd, yyyy") ?? "N/A")</td>
+
+                                <td class="amount-cell">@item.Amount.ToString("C", System.Globalization.CultureInfo.CurrentCulture)</td>
+                                <td>
+                                    <span class="status-badge @(item.Status.ToString().ToLower())">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="reference-badge">@item.InvoiceReference</span>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.InvoiceFilePath))
+                                    {
+                                        <a href="@Url.Content(item.InvoiceFilePath)" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-file-pdf"></i> View
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No file</span>
+                                    }
+                                </td>
+                                <td class="action-buttons">
+                                    <a asp-action="Edit" asp-route-id="@item.InvoiceId" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.InvoiceId" class="btn btn-sm btn-outline-info" title="Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.InvoiceId" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    /* === Header === */
+    .page-header {
+        background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+        color: white;
+        padding: 2rem;
+        margin: -2rem -2rem 2rem -2rem;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+        .page-header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        .page-header .lead {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+    /* === Card === */
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-primary, .btn-info {
+        font-weight: 600;
+        color: white;
+        border: none;
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+    }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #138496, #117a8b);
+        }
+
+    /* === Table === */
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        color: #495057;
+    }
+
+        .table-header th {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: none;
+            border-bottom: 2px solid #dee2e6;
+            padding: 15px 12px;
+        }
+
+    .table-row td {
+        padding: 15px 12px;
+        vertical-align: middle;
+        font-size: 0.95rem;
+        border: none;
+    }
+
+    .table-row:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-1px);
+        transition: 0.3s ease;
+    }
+
+    /* === Badges & Status === */
+    .invoice-badge {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .reference-badge {
+        background: #e9ecef;
+        color: #495057;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .amount-cell {
+        color: #28a745;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+
+        .status-badge.unpaid {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .status-badge.paid {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-badge.overdue {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-badge.partiallypaid {
+            background: #fd7e14;
+            color: white;
+        }
+
+    /* === Action Buttons === */
+    .action-buttons .btn {
+        margin: 0 2px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        padding: 6px 10px;
+        transition: all 0.3s ease;
+        border: 2px solid;
+    }
+
+        .action-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+    === Responsive ===
+    @@media (max-width: 768px) {
+        .page-header
+
+    {
+        margin: -1rem -1rem 2rem -1rem;
+        padding: 1.5rem;
+    }
+
+    .table-header th, .table-row td {
+        font-size: 0.8rem;
+        padding: 10px 6px;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+        .btn-group .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+    }
+</style>

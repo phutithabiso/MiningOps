@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using MiningOps.Entity;
+using MiningOps.Entity.roleFolder;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -20,13 +21,12 @@ namespace MiningOps.Models
 
         [Required]
         [MaxLength(50)]
-        public string? Status { get; set; } = "Pending";
+        public String? Status { get; set; } = "Pending";
 
         [Required]
         [DataType(DataType.Date)]
         public DateTime RequestDate { get; set; } = DateTime.Now;
-
-        
+  
 
 
     }

@@ -46,7 +46,7 @@ namespace MiningOps.Entity
         public Supplier? SupplierProfile { get; set; }
 
         // 1:n
-        //public ICollection<MaterialRequest>? MaterialRequests { get; set; }
+      // public ICollection<MaterialRequest>? MaterialRequests { get; set; }
         //public ICollection<PurchaseOrder>? CreatedPurchaseOrders { get; set; }
         //public ICollection<Invoice>? ApprovedInvoices { get; set; }
         //public ICollection<AuditLog>? AuditLogs { get; set; }

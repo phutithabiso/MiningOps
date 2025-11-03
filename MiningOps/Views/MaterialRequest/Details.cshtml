@@ -1,42 +1,37 @@
-﻿   @model MiningOps.Entity.MaterialRequest
-
+﻿@model MiningOps.Models.MaterialRequestViewModel
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Material Request Details";
 }
 
-<h1>Details</h1>
+<link rel="stylesheet" href="~/css/site1.css" asp-append-version="true" />
 
-<div>
-    <h4>MaterialRequest</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ItemName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ItemName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RequestDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RequestDate)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MaterialRequestId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-eye"></i> Request Details</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Item Name</dt>
+            <dd class="col-sm-9">@Model.ItemName</dd>
+
+            <dt class="col-sm-3">Quantity</dt>
+            <dd class="col-sm-9">@Model.Quantity</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">
+                <span class="badge badge-info">@Model.Status</span>
+            </dd>
+
+            <dt class="col-sm-3">Request Date</dt>
+            <dd class="col-sm-9">@Model.RequestDate.ToString("f")</dd>
+        </dl>
+    </div>
+    <div class="card-footer text-right">
+        <a asp-action="Edit" asp-route-id="@Model.MaterialRequestId" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
 </div>

@@ -2,10 +2,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MiningOps.Entity;
+using MiningOps.Services;
+using OfficeOpenXml;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//ExcelPackage.License = LicenseContext.NonCommercial;
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -13,6 +16,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+builder.Services.AddScoped<DashboardAnalyticsService>();
+builder.Services.AddScoped<ReportService>();
+
+
 
 var app = builder.Build();
 
@@ -28,8 +35,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseAuthentication(); 
 app.UseAuthorization();
-app.UseAuthentication();
 
 app.MapStaticAssets();
 

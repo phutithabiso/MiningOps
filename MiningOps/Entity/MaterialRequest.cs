@@ -24,9 +24,9 @@ namespace MiningOps.Entity
         [Required]
         [DataType(DataType.Date)]
         public DateTime RequestDate { get; set; } = DateTime.Now;
-        public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
        
 
+        public ICollection<PurchaseOrder>? PurchaseOrders { get; set; }
 
     }
 }
